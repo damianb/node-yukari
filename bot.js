@@ -11,13 +11,13 @@
 /**
  * includes
  */
-var _s = require('underscore.string')
-var irc = require('irc')
-var http = require('http')
-var https = require('https')
-var colors = irc.colors
-var yukari = require('./yukari')
-var url = require('url')
+var _s = require('underscore.string'),
+    irc = require('irc'),
+    http = require('http'),
+    https = require('https'),
+    colors = irc.colors,
+    yukari = require('./yukari'),
+    url = require('url')
 
 //var db = require('orm')
 
