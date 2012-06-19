@@ -2,6 +2,10 @@ var _s = require('underscore.string')
 var https = require('https')
 
 var yukari = {}
+yukari.version = function() {
+	// makeshift version constant
+	return '0.0.1'
+}
 yukari.grabYoutube = function(videoid, callback, error) {
 	// https://gdata.youtube.com/feeds/api/videos/$videoid?v=2&alt=json
 	var options = {

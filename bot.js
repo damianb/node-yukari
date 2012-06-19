@@ -1,50 +1,58 @@
 /**
  * Yukari IRC bot, node.js flavor
- *
- * requires:
- *  npm:
- *  	underscore.string
- *  	irc
- *  	orm (in the near-ish future?)
  */
 
 /**
  * includes
  */
-var _s = require('underscore.string'),
-    irc = require('irc'),
+var yukari = require('./yukari'),
+
+	// node builtins
     http = require('http'),
     https = require('https'),
-    colors = irc.colors,
-    yukari = require('./yukari'),
-    url = require('url')
 
-//var db = require('orm')
-
-/*
-_.str = require('underscore.string')
-_.mixin(_.str.exports())
-_.str.include('Underscore.string', 'string')
-*/
+	// npm packages
+	_s = require('underscore.string'),
+	nconf = require('nconf'),
+    url = require('url'),
+	irc = require('irc'),
+	//db = require('orm'),
+	colors = irc.colors
 
 /**
  * configuration
  */
-var config = require('./config')
+nconf.argv().env()
+nconf.file({file: 'config.json'})
+nconf.defaults({
+	'bot':{
+		'nick'			:'Yukari-chan',
+		'username'		:'Yukari',
+		'realname'		:'Yukari.js IRC bot',
+		'owner'			:'unknown',
+		'command'		:'!',
+		'nickserv_pass'	:'',
+		'primarychannel':'#yukari'
+	},
+	'irc':{
+		'address':'irc.oftc.net',
+		'port':6667,
+		'secure':false,
+	}
+})
 
 /**
  * Prep for connection
  */
-var client = new irc.Client('irc.oftc.net', config.nick, {
-	userName: 'yukari',
-	realName: 'Yukari IRC bot - node.js build',
-	channels: [config.primary_channel],
-	port: 6667,
-	secure: false,
+var client = new irc.Client(nconf.get('irc:address'), nconf.get('bot:nick'), {
+	userName: nconf.get('bot:username'),
+	realName: nconf.get('bot:realname') + ' (owner: ' + nconf.get('bot:owner') + ')',
+	channels: [nconf.get('bot:primarychannel')],
+	port: nconf.get('irc:port'),
+	secure: nconf.get('irc:secure'),
 	autoConnect: false,
 	stripColors: true
 })
-var start = Date.now()
 
 client.addListener('registered', function() {
 	console.log('-!- connection established')
@@ -71,8 +79,9 @@ client.addListener('pm', function (nick, text) {
 client.addListener('ctcp', function (from, to, text, type) {
 	console.log('CTCP ' + type + ': ' + from + ' (' + text + ')')
 	if(text == 'VERSION') {
-		console.log('CTCP REPLY VERSION: => ' + from + ' (Yukari IRC bot - node.js build)')
-		client.ctcp(from, 'VERSION', 'Yukari IRC bot - node.js build')
+		var reply = 'Yukari.js IRC bot - version ' + yukari.version()
+		console.log('CTCP REPLY VERSION: => ' + from + ' (' + reply + ')')
+		client.ctcp(from, 'VERSION', reply)
 	}
 })
 
@@ -81,49 +90,49 @@ client.addListener('ctcp', function (from, to, text, type) {
  */
 client.addListener('motd', function (motd) {
 	console.log('-!- identifying to nickserv...')
-	client.say('NickServ', 'identify ' + config.nickserv_pass)
-	nickserv_pass = ''
+	if(nconf.get('bot:nickserv_pass')) {
+		client.say('NickServ', 'identify ' + nconf.get('bot:nickserv_pass'))
+		nconf.set('bot:nickserv_pass', '')
+		// for sec reasons, nuke this from memory
+	}
 })
 
 /**
  * handle commands in our primary channel
  */
-client.addListener('message' + config.primary_channel, function (nick, text) {
-	if(text.charAt(0) == config.command_sep) {
+client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, text) {
+	if(text.charAt(0) == nconf.get('bot:command')) {
 		console.log('debug: received command "' + text.slice(1) + '"')
 		var command = text.slice(1).split(' ', 2)
 		switch(command[0]) {
 			case 'youtube':
 				var videoid = false
-				var params = url.parse(command[1],true)
-				
-				
-				if(params['query']['v'] != null) {
-					videoid = params['query']['v']
-				}
+				var params = (command.length > 1) ? url.parse(command[1],true) : false
 
-				else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
-					videoid = params['path'].split('/')[1]
+				if(params) {
+					if(params['query']['v'] != null) {
+						videoid = params['query']['v']
+					}
+					else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
+						videoid = params['path'].split('/')[1]
+					}
 				}
-
-				console.log(videoid)
 
 				if(videoid != false) {
 					yukari.grabYoutube(videoid, function(ret) {
 						if(ret !== false) {
-							client.say(config.primary_channel, ret.replace('[YouTube]', '[' + colors.wrap('light_red', 'You') + colors.wrap('white', 'Tube') + ']'))
+							client.say(nconf.get('bot:primarychannel'), ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 						} else {
-							client.action(config.primary_channel, 'hiccups')
+							client.action(nconf.get('bot:primarychannel'), 'hiccups')
 						}
 					})
 				}
-
 				break;
 
 			case 'die':
-				client.say(config.primary_channel, colors.wrap('light_red', 'Seppuku time.'))
+				client.say(nconf.get('bot:primarychannel'), 'Bai!')
 				console.log('-!- TERMINATING')
-				client.disconnect()
+				client.disconnect('Yukari.js IRC bot - version ' + yukari.version())
 				break;
 			default:
 				console.log('debug: unknown command "' + command[0] + '"')
