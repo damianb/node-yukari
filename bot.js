@@ -35,7 +35,7 @@ var config = require('./config')
 /**
  * Prep for connection
  */
-var client = new irc.Client('irc.oftc.net', 'Yukari-chan', {
+var client = new irc.Client('irc.oftc.net', config.nick, {
 	userName: 'yukari',
 	realName: 'Yukari IRC bot - node.js build',
 	channels: [config.primary_channel],
