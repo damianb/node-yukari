@@ -1,0 +1,9 @@
+# Yukari IRC bot - node.js flavor
+
+oh god why are you looking at this code
+
+i'm still learning node.js okay please don't shoot me
+
+## todo
+
+a lot of things, including authentication of some sort, trusting users, proper use of configs, package.json
