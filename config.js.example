@@ -1,0 +1,7 @@
+var config = {}
+
+config.command_sep = '!'
+config.nickserv_pass = 'yourpasswordhere'
+config.primary_channel = '#channel'
+
+module.exports = config
