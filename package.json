@@ -1,0 +1,14 @@
+{
+  "name": "Yukari IRC bot - node.js flavor",
+  "description": "Port of Yukari IRC bot to node.js",
+  "author": "Damian Bushong <katana@codebite.net>",
+  "licenses": { "type": "MIT" },
+  "dependencies": {
+    "irc": "0.3.x",
+    "underscore.string": "2.2.x"
+  },
+  "devDependencies": {
+    //"vows": "0.5.x"
+  },
+  "engine": "node >= 0.6.19"
+}
