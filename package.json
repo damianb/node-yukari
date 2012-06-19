@@ -5,6 +5,7 @@
   "licenses": { "type": "MIT" },
   "dependencies": {
     "irc": "0.3.x",
+    "url": "0.4.x",
     "underscore.string": "2.2.x"
   },
   "devDependencies": {
