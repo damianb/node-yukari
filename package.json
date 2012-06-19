@@ -1,5 +1,5 @@
 {
-  "name": "Yukari IRC bot - node.js flavor",
+  "name": "yukari.js",
   "description": "Port of Yukari IRC bot to node.js",
   "author": "Damian Bushong <katana@codebite.net>",
   "licenses": { "type": "MIT" },
