@@ -93,18 +93,26 @@ client.addListener('message' + config.primary_channel, function (nick, text) {
 		switch(command[0]) {
 			case 'youtube':
 				var videoid = false
-				var regex = /youtube\.com\/watch\?(?:.*)v\=([a-z0-9_\-]+)(?:.*)/i
-				var match = regex.exec(command[0])
+				var regex = /youtube\.com.*v=([a-zA-Z0-9_\-]+)/
+				var match = regex.exec(command[1])
 				if(match != null) {
 					videoid = match[1]
 				}
 
-				if(command[0].match(/^[a-z0-9_\-]+$/i)) {
-					videoid = command[0]
+				regex = /youtu\.be\/([a-zA-Z0-9_\-]+)/
+				var match = regex.exec(command[1])
+				if(match != null) {
+					videoid = match[1]
 				}
 
+				if(command[1].match(/^[a-zA-Z0-9_\-]+$/)) {
+					videoid = command[1]
+				}
+
+				console.log(videoid)
+
 				if(videoid != false) {
-					yukari.grabYoutube(command[1], function(ret) {
+					yukari.grabYoutube(videoid, function(ret) {
 						if(ret !== false) {
 							client.say(config.primary_channel, ret.replace('[YouTube]', '[' + colors.wrap('light_red', 'You') + colors.wrap('white', 'Tube') + ']'))
 						} else {
