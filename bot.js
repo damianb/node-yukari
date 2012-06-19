@@ -92,14 +92,27 @@ client.addListener('message' + config.primary_channel, function (nick, text) {
 		var command = text.slice(1).split(' ', 2)
 		switch(command[0]) {
 			case 'youtube':
-				yukari.grabYoutube(command[1], function(ret) {
-					if(ret !== false) {
-						client.say(config.primary_channel, ret.replace('[YouTube]', '[' + colors.wrap('light_red', 'You') + colors.wrap('white', 'Tube') + ']'))
-					} else {
-						client.action(config.primary_channel, 'hiccups')
-					}
-					//console.log(ret)
-				})
+				var videoid = false
+				var regex = /youtube\.com\/watch\?(?:.*)v\=([a-z0-9_\-]+)(?:.*)/i
+				var match = regex.exec(command[0])
+				if(match != null) {
+					videoid = match[1]
+				}
+
+				if(command[0].match(/^[a-z0-9_\-]+$/i)) {
+					videoid = command[0]
+				}
+
+				if(videoid != false) {
+					yukari.grabYoutube(command[1], function(ret) {
+						if(ret !== false) {
+							client.say(config.primary_channel, ret.replace('[YouTube]', '[' + colors.wrap('light_red', 'You') + colors.wrap('white', 'Tube') + ']'))
+						} else {
+							client.action(config.primary_channel, 'hiccups')
+						}
+					})
+				}
+
 				break;
 
 			case 'die':
