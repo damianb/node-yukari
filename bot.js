@@ -17,6 +17,8 @@ var http = require('http')
 var https = require('https')
 var colors = irc.colors
 var yukari = require('./yukari')
+var url = require('url')
+
 //var db = require('orm')
 
 /*
@@ -93,20 +95,15 @@ client.addListener('message' + config.primary_channel, function (nick, text) {
 		switch(command[0]) {
 			case 'youtube':
 				var videoid = false
-				var regex = /youtube\.com.*v=([a-zA-Z0-9_\-]+)/
-				var match = regex.exec(command[1])
-				if(match != null) {
-					videoid = match[1]
+				var params = url.parse(command[1],true)
+				
+				
+				if(params['query']['v'] != null) {
+					videoid = params['query']['v']
 				}
 
-				regex = /youtu\.be\/([a-zA-Z0-9_\-]+)/
-				var match = regex.exec(command[1])
-				if(match != null) {
-					videoid = match[1]
-				}
-
-				if(command[1].match(/^[a-zA-Z0-9_\-]+$/)) {
-					videoid = command[1]
+				else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
+					videoid = params['path'].split('/')[1]
 				}
 
 				console.log(videoid)
