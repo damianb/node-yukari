@@ -1,8 +1,0 @@
-var config = {}
-
-config.command_sep = '!'
-config.nickserv_pass = 'yourpasswordhere'
-config.primary_channel = '#channel'
-config.nick = 'some_nick'
-
-module.exports = config
