@@ -56,7 +56,7 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 			client.say(channel, victim + ': ' + (Math.round(Math.random()) ? 'heads' : 'tails'))
 			break;
 		case 'random':
-			client.say(channel, victim + ': 4')
+			client.say(channel, victim + ': 4') // http://xkcd.com/221/
 			break;
 		case 'version':
 			client.say(channel, victim + ': I am running Yukari.js IRC bot, version ' + yukari.version())
