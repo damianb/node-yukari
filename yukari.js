@@ -52,7 +52,7 @@ yukari.rollDice = function(number, sides, additional, rest) {
 	}
 	if(additional) {
 		roll += additional
-		return number + 'd' + sides + ((additional > 0) ? '+' : '-') + ' ' + additional + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + '] totaling ' + roll
+		return number + 'd' + sides + ((additional > 0) ? ' +' : ' -') + ' ' + additional + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + '] totaling ' + roll
 	}
 
 	return number + 'd' + sides + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + '] totaling ' + roll
@@ -89,7 +89,7 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 					additional = match.shift()
 				}
 				if(match.length > 0) {
-					rest = match.join('')
+					rest = _s.trim(match.join(''))
 				}
 
 				if(additional) {
