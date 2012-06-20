@@ -85,10 +85,10 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 				match.shift()
 				number = match.shift()
 				sides = match.shift()
-				if(match.length > 2) {
+				if(match.length > 0) {
 					additional = match.shift()
 				}
-				if(match.length > 3) {
+				if(match.length > 0) {
 					rest = match.join('')
 				}
 
