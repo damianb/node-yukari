@@ -52,10 +52,10 @@ yukari.rollDice = function(number, sides, additional, rest) {
 	}
 	if(additional) {
 		roll += additional
-		return number + 'd' + sides + ((additional > 0) ? '+' : '-') + ' ' + rest + ', got [' + rolls.join(',') + '] totaling ' + rolls
+		return number + 'd' + sides + ((additional > 0) ? '+' : '-') + ' ' + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + '] totaling ' + rolls
 	}
 
-	return number + 'd' + sides + ' ' + rest + ', got [' + rolls.join(',') + '] totaling ' + rolls
+	return number + 'd' + sides + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + '] totaling ' + rolls
 }
 
 yukari.parseCommand = function(client, channel, victim, command, args) {
@@ -100,7 +100,7 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 			} else {
 				client.action(channel, 'hiccups')
 			}
-			_s.trim()
+			break;
 		case 'version':
 			client.say(channel, victim + ': I am running Yukari.js IRC bot, version ' + yukari.version())
 			break;
