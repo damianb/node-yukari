@@ -7,7 +7,7 @@ yukari.version = function() {
 	// makeshift version constant
 	return '0.0.1'
 }
-yukari.grabYoutube = function(videoid, callback, error) {
+yukari.grabYoutube = function(videoid, callback) {
 	// https://gdata.youtube.com/feeds/api/videos/$videoid?v=2&alt=json
 	var options = {
 		host: 'gdata.youtube.com',
@@ -39,6 +39,25 @@ yukari.grabYoutube = function(videoid, callback, error) {
 		})
 }
 
+yukari.rollDice = function(number, sides, additional, rest) {
+	var roll = 0
+	var rolls = []
+	for(i = 0; i < number; i++) {
+		var t = 0
+		if(sides >= 1) {
+			t = Math.floor(Math.random() * sides) + 1
+			rolls.push(t)
+			roll += t
+		}
+	}
+	if(additional) {
+		roll += additional
+		return number + 'd' + sides + ((additional > 0) ? '+' : '-') + ' ' + rest + ', got [' + rolls.join(',') + '] totaling ' + rolls
+	}
+
+	return number + 'd' + sides + ' ' + rest + ', got [' + rolls.join(',') + '] totaling ' + rolls
+}
+
 yukari.parseCommand = function(client, channel, victim, command, args) {
 	switch(command) {
 		case 'to':
@@ -58,6 +77,30 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 		case 'random':
 			client.say(channel, victim + ': 4') // http://xkcd.com/221/
 			break;
+		case 'roll':
+			var match = args.match(/(\d+)\s*d\s*(\d+)(\s*[-+]\s*\d+)?(.*)/i)
+			if(match != null || match.length < 2) {
+				var number, sides, additional, rest
+
+				match.shift()
+				number = match.shift()
+				sides = match.shift()
+				if(match.length > 2) {
+					additional = match.shift()
+				}
+				if(match.length > 3) {
+					rest = match.join('')
+				}
+
+				if(additional) {
+					additional = parseInt(_s.trim(additional))
+				}
+
+				client.say(channel, victim + ' rolls ' + yukari.rollDice(number, sides, additional, rest))
+			} else {
+				client.action(channel, 'hiccups')
+			}
+			_s.trim()
 		case 'version':
 			client.say(channel, victim + ': I am running Yukari.js IRC bot, version ' + yukari.version())
 			break;
