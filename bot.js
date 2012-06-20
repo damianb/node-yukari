@@ -109,6 +109,12 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 		console.log('debug: received command "' + text.slice(1) + '"')
 		var command = text.slice(1).split(' ', 2)
 		switch(command[0]) {
+			case 'version':
+				client.say(nconf.get('bot:primarychannel'), 'Yukari.js IRC bot - version ' + yukari.version())
+				break;
+			case 'source':
+				client.say(nconf.get('bot:primarychannel'), 'My source is available at <https://github.com/damianb/node-yukari>')
+				break;
 			case 'youtube':
 				var videoid = false
 				var params = (command.length > 1) ? url.parse(command[1],true) : false
@@ -142,6 +148,7 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 		}
 	}
 })
+
 /**
  * YouTube URI Eavesdropping
  */
