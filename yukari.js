@@ -39,5 +39,49 @@ yukari.grabYoutube = function(videoid, callback, error) {
 			callback(false)
 		})
 }
+yukari.parseCommand = function(client, from, command, args) {
+	switch(command) {
+		case 'to':
+			var split = args.split(' ', 3)
+			yukari.parseCommand(client, split[1], split[0], split[2])
+			break;
+		case 'version':
+			client.say(nconf.get('bot:primarychannel'), from + ': I am running Yukari.js IRC bot, version ' + yukari.version())
+			break;
+		case 'source':
+			client.say(nconf.get('bot:primarychannel'), from + ': My source is available at <https://github.com/damianb/node-yukari>')
+			break;
+		case 'youtube':
+			var videoid = false
+			var params = (command.length > 1) ? url.parse(args,true) : false
+
+			if(params) {
+				if(params['query']['v'] != null) {
+					videoid = params['query']['v']
+				} else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
+					videoid = params['path'].split('/')[1]
+				}
+			}
+
+			if(videoid != false) {
+				yukari.grabYoutube(videoid, function(ret) {
+					if(ret !== false) {
+						client.say(nconf.get('bot:primarychannel'), ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
+					} else {
+						client.action(nconf.get('bot:primarychannel'), 'hiccups')
+					}
+				})
+			}
+			break;
+
+		case 'die':
+			client.say(nconf.get('bot:primarychannel'), 'Bai!')
+			console.log('-!- TERMINATING')
+			client.disconnect('Yukari.js IRC bot - version ' + yukari.version())
+			break;
+		default:
+			console.log('debug: unknown command "' + command[0] + '"')
+	}
+}
 
 module.exports = yukari
