@@ -43,9 +43,13 @@ yukari.grabYoutube = function(videoid, callback, error) {
 yukari.parseCommand = function(client, channel, victim, command, args) {
 	switch(command) {
 		case 'to':
-			var split = args.split(' ', 3)
-			if(split.length >= 2) {
-				yukari.parseCommand(client, channel, split[1], split[0], split[2])
+			var split = args.split(' ')
+
+			if(split.length > 1) {
+				var nvictim = split.shift(),
+					ncommand = split.shift(),
+					nargs = split.join(' ')
+				yukari.parseCommand(client, channel, nvictim, ncommand, nargs)
 			} else {
 				client.say(channel, victim + ': Need more arguments for that command')
 			}
@@ -85,6 +89,7 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 			client.disconnect('Yukari.js IRC bot - version ' + yukari.version())
 			break;
 		default:
+			client.action(channel, 'hiccups')
 			console.log('debug: unknown command "' + command + '"')
 	}
 }
