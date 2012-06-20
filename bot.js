@@ -8,13 +8,13 @@
 var yukari = require('./yukari'),
 
 	// node builtins
-    http = require('http'),
-    https = require('https'),
+	http = require('http'),
+	https = require('https'),
 
 	// npm packages
 	_s = require('underscore.string'),
 	nconf = require('nconf'),
-    url = require('url'),
+	url = require('url'),
 	irc = require('irc'),
 	//db = require('orm'),
 	colors = irc.colors
