@@ -1,0 +1,7 @@
+{
+	"bot":{
+		"owner":"yournickhere",
+		"nickserv_pass":"somepass",
+		"primarychannel":"#0i"
+	}
+}
