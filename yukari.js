@@ -1,5 +1,6 @@
 var _s = require('underscore.string')
 var https = require('https')
+var irc = require('irc')
 
 var yukari = {}
 yukari.version = function() {
@@ -39,17 +40,21 @@ yukari.grabYoutube = function(videoid, callback, error) {
 			callback(false)
 		})
 }
-yukari.parseCommand = function(client, from, command, args) {
+yukari.parseCommand = function(client, channel, victim, command, args) {
 	switch(command) {
 		case 'to':
 			var split = args.split(' ', 3)
-			yukari.parseCommand(client, split[1], split[0], split[2])
+			if(split.length >= 2) {
+				yukari.parseCommand(client, channel, split[1], split[0], split[2])
+			} else {
+				client.say(channel, victim + ': Need more arguments for that command')
+			}
 			break;
 		case 'version':
-			client.say(nconf.get('bot:primarychannel'), from + ': I am running Yukari.js IRC bot, version ' + yukari.version())
+			client.say(channel, victim + ': I am running Yukari.js IRC bot, version ' + yukari.version())
 			break;
 		case 'source':
-			client.say(nconf.get('bot:primarychannel'), from + ': My source is available at <https://github.com/damianb/node-yukari>')
+			client.say(channel, victim + ': My source is available at <https://github.com/damianb/node-yukari>')
 			break;
 		case 'youtube':
 			var videoid = false
@@ -66,21 +71,21 @@ yukari.parseCommand = function(client, from, command, args) {
 			if(videoid != false) {
 				yukari.grabYoutube(videoid, function(ret) {
 					if(ret !== false) {
-						client.say(nconf.get('bot:primarychannel'), ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
+						client.say(channel, ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 					} else {
-						client.action(nconf.get('bot:primarychannel'), 'hiccups')
+						client.action(channel, 'hiccups')
 					}
 				})
 			}
 			break;
 
 		case 'die':
-			client.say(nconf.get('bot:primarychannel'), 'Bai!')
+			client.say(channel, 'Bai!')
 			console.log('-!- TERMINATING')
 			client.disconnect('Yukari.js IRC bot - version ' + yukari.version())
 			break;
 		default:
-			console.log('debug: unknown command "' + command[0] + '"')
+			console.log('debug: unknown command "' + command + '"')
 	}
 }
 

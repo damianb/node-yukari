@@ -108,7 +108,7 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 	if(text.charAt(0) == nconf.get('bot:command')) {
 		console.log('debug: received command "' + text.slice(1) + '"')
 		var command = text.slice(1).split(' ', 2)
-		yukari.parseCommand(client, nick, command[0], command[1])
+		yukari.parseCommand(client, nconf.get('bot:primarychannel'), nick, command[0], command[1])
 	}
 })
 
