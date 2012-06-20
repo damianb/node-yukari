@@ -93,7 +93,7 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 				}
 
 				if(additional) {
-					additional = _s.trim(additional)
+					additional = _s.trim(additional).replace(' ', '')
 					if(additional.charAt(0) == '-') {
 						additional = parseInt(additional) * -1
 					} else {
