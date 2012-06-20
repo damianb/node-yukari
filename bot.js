@@ -110,10 +110,10 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 		var command = text.slice(1).split(' ', 2)
 		switch(command[0]) {
 			case 'version':
-				client.say(nconf.get('bot:primarychannel'), 'Yukari.js IRC bot - version ' + yukari.version())
+				client.say(nconf.get('bot:primarychannel'), nick + ': I am running Yukari.js IRC bot, version ' + yukari.version())
 				break;
 			case 'source':
-				client.say(nconf.get('bot:primarychannel'), 'My source is available at <https://github.com/damianb/node-yukari>')
+				client.say(nconf.get('bot:primarychannel'), nick + ': My source is available at <https://github.com/damianb/node-yukari>')
 				break;
 			case 'youtube':
 				var videoid = false
