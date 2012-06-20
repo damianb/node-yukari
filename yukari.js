@@ -23,15 +23,13 @@ yukari.grabYoutube = function(videoid, callback, error) {
 				})
 				.on('end', function() {
 					var data = JSON.parse(api_body)
-					var format = '[YouTube] <http://youtu.be/%s> "%s" [%d:%d] - %d views, %d likes, %d dislikes'
+					var format = '[YouTube] <http://youtu.be/%s> "%s" [%d:%d] - %d views'
 					callback(_s.sprintf(format,
 						data['entry']['media$group']['yt$videoid']['$t'],
 						data['entry']['title']['$t'],
 						Math.round(data['entry']['media$group']['yt$duration']['seconds'] / 60),
 						data['entry']['media$group']['yt$duration']['seconds'] % 60,
-						Number(data['entry']['yt$statistics']['viewCount']),
-						Number(data['entry']['yt$rating']['numLikes']),
-						Number(data['entry']['yt$rating']['numDislikes'])
+						Number(data['entry']['yt$statistics']['viewCount'])
 					))
 				})
 		})
@@ -40,11 +38,11 @@ yukari.grabYoutube = function(videoid, callback, error) {
 			callback(false)
 		})
 }
+
 yukari.parseCommand = function(client, channel, victim, command, args) {
 	switch(command) {
 		case 'to':
 			var split = args.split(' ')
-
 			if(split.length > 1) {
 				var nvictim = split.shift(),
 					ncommand = split.shift(),
@@ -53,6 +51,12 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 			} else {
 				client.say(channel, victim + ': Need more arguments for that command')
 			}
+			break;
+		case 'coin':
+			client.say(channel, victim + ': ' + (Math.round(Math.random()) ? 'heads' : 'tails'))
+			break;
+		case 'random':
+			client.say(channel, victim + ': 4')
 			break;
 		case 'version':
 			client.say(channel, victim + ': I am running Yukari.js IRC bot, version ' + yukari.version())
@@ -89,6 +93,7 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 			client.disconnect('Yukari.js IRC bot - version ' + yukari.version())
 			break;
 		default:
+			// at some point, fall back to magic commands?
 			client.action(channel, 'hiccups')
 			console.log('debug: unknown command "' + command + '"')
 	}
