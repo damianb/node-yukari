@@ -54,23 +54,22 @@ var client = new irc.Client(nconf.get('irc:address'), nconf.get('bot:nick'), {
 	stripColors: true
 })
 
-client.addListener('registered', function() {
-	console.log('-!- connection established')
-})
-
 /**
  * display notices, messages, and pm's
  */
+client.addListener('registered', function() {
+	console.log('-!- connection established')
+})
 client.addListener('message#', function (from, to, text) {
 	console.log(from + ' => ' + to + ': ' + text)
+})
+client.addListener('pm', function (nick, text) {
+	console.log(nick + ' => ~: ' + text)
 })
 client.addListener('notice', function (from, to, text) {
 	if(from) {
 		console.log('NOTICE ' + from + ' => ' + to + ': ' + text)
 	}
-})
-client.addListener('pm', function (nick, text) {
-	console.log(nick + ' => ~: ' + text)
 })
 
 /**
@@ -78,10 +77,14 @@ client.addListener('pm', function (nick, text) {
  */
 client.addListener('ctcp', function (from, to, text, type) {
 	console.log('CTCP ' + type + ': ' + from + ' (' + text + ')')
-	if(text == 'VERSION') {
-		var reply = 'Yukari.js IRC bot - version ' + yukari.version()
-		console.log('CTCP REPLY VERSION: => ' + from + ' (' + reply + ')')
-		client.ctcp(from, 'VERSION', reply)
+	switch(text.toLowerCase()) {
+		case 'version':
+			var reply = 'Yukari.js IRC bot - version ' + yukari.version()
+			console.log('CTCP REPLY VERSION: => ' + from + ' (' + reply + ')')
+			client.ctcp(from, 'VERSION', reply)
+			break;
+		default:
+			console.log('Unknown CTCP "' + text + '" from ' + from)
 	}
 })
 
@@ -92,8 +95,9 @@ client.addListener('motd', function (motd) {
 	console.log('-!- identifying to nickserv...')
 	if(nconf.get('bot:nickserv_pass')) {
 		client.say('NickServ', 'identify ' + nconf.get('bot:nickserv_pass'))
-		nconf.set('bot:nickserv_pass', '')
+
 		// for sec reasons, nuke this from memory
+		nconf.set('bot:nickserv_pass', '')
 	}
 })
 
