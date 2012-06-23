@@ -2,12 +2,36 @@ var _s = require('underscore.string')
 var https = require('https')
 var irc = require('irc')
 
-var yukari = {}
-yukari.version = function() {
-	// makeshift version constant
-	return '0.0.1'
+function yukari(client, cmds) {
+	this.version = '0.0.2'
+	this.client = client
+	this.commands = {}
+	this.ctcp_hooked = {}
+	this.message_hooked = {}
+	this.sniff_hooked = []
+
+	for(var c in cmds) {
+		this.commands[cmds[c]] = require('./command/' + cmds[c])
+		this.commands[cmds[c]].register(yukari)
+	}
+
+	//asdf
 }
-yukari.grabYoutube = function(videoid, callback) {
+
+yukari.prototype.register = function(type, name, sub) {
+	switch(type) {
+		case 'ctcp':
+			this.ctcp_hooked.push(name)
+			break;
+		case 'message':
+			this.message_hooked.push(name)
+			break;
+		case 'sniff':
+			this.sniff_hooked.push(name)
+			break;
+	}
+}
+yukari.prototype.grabYoutube = function(videoid, callback) {
 	// https://gdata.youtube.com/feeds/api/videos/$videoid?v=2&alt=json
 	var options = {
 		host: 'gdata.youtube.com',
@@ -52,7 +76,7 @@ yukari.rollDice = function(number, sides, additional, rest) {
 	}
 	if(additional) {
 		roll += additional
-		return number + 'd' + sides + ((additional > 0) ? ' +' : ' -') + ' ' + additional + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + '] totaling ' + roll
+		return number + 'd' + sides + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + ']' + ((additional > 0) ? ' +' : ' -') + ' ' + additional + ' totaling ' + roll
 	}
 
 	return number + 'd' + sides + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + '] totaling ' + roll

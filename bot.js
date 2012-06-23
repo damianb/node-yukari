@@ -107,7 +107,7 @@ client.addListener('motd', function (motd) {
 client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, text) {
 	if(text.charAt(0) == nconf.get('bot:command')) {
 		var split = text.slice(1).split(' ')
-		yukari.parseCommand(client, nconf.get('bot:primarychannel'), nick, split.shift(), split.join(' '))
+		yukari.parseCommand(client, nconf.get('bot:primarychannel'), nick, split.shift(), split)
 	}
 })
 
