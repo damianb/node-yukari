@@ -110,8 +110,8 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 		var command = split.shift()
 		if(command in yukari.message_hooked) {
 			for(var c in yukari.message_hooked) {
-				if(yukari.commands[yukari.message_hooked[command][c]].validate(command, split)) {
-					yukari.commands[yukari.message_hooked[command][c]].process(
+				if(yukari.commands[yukari.message_hooked[command][c]].validateMessage(victim, split)) {
+					yukari.commands[yukari.message_hooked[command][c]].processMessage(
 						function(message){
 							if(message == false) {
 								client.action(nconf.get('bot:primarychannel'), 'hiccups')
@@ -120,43 +120,47 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 							}
 						},
 						nick,
-						command,
 						split
 					)
 				}
 			}
+		} else {
+			// @todo - magic commands / factoids
 		}
-		yukari.parseCommand(client, nconf.get('bot:primarychannel'), nick, command, split)
+		//yukari.parseCommand(client, nconf.get('bot:primarychannel'), nick, command, split)
 	}
 })
 
 /**
- * YouTube URI Eavesdropping
- */
+ * non-command eavesdropping...
+ *
 client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, text) {
-	youtube = text.match(/http:\/\/(?:(?:www\.)?youtube\.com|youtu\.be)(?:\/watch\?v=|\/)([\w\-\_]+)/ig)
-	if(youtube != null) {
-		for(i in youtube) {
-			var videoid = false
-			var params = url.parse(youtube[i],true)
-			if(params['query']['v'] != null) {
-				videoid = params['query']['v']
-			} else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
-				videoid = params['path'].split('/')[1]
-			}
+	if(text.charAt(0) != nconf.get('bot:command')) {
+		youtube = text.match(/http:\/\/(?:(?:www\.)?youtube\.com|youtu\.be)(?:\/watch\?v=|\/)([\w\-\_]+)/ig)
+		if(youtube != null) {
+			for(i in youtube) {
+				var videoid = false
+				var params = url.parse(youtube[i],true)
+				if(params['query']['v'] != null) {
+					videoid = params['query']['v']
+				} else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
+					videoid = params['path'].split('/')[1]
+				}
 
-			if(videoid != false) {
-					yukari.grabYoutube(videoid, function(ret) {
-					if(ret !== false) {
-						client.say(nconf.get('bot:primarychannel'), ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
-					} else {
-						client.action(nconf.get('bot:primarychannel'), 'hiccups')
-					}
-				})
+				if(videoid != false) {
+						yukari.grabYoutube(videoid, function(ret) {
+						if(ret !== false) {
+							client.say(nconf.get('bot:primarychannel'), ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
+						} else {
+							client.action(nconf.get('bot:primarychannel'), 'hiccups')
+						}
+					})
+				}
 			}
 		}
 	}
 })
+ */
 
 /**
  * runtime
