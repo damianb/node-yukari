@@ -15,7 +15,7 @@ module.exports = {
 		// asdf
 	},
 
-	process:function(callbacks, channel, victim, command, args) {
+	process:function(callback, victim, command, args) {
 		// asdf
 	}
 }

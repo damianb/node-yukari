@@ -104,10 +104,29 @@ client.addListener('motd', function (motd) {
 /**
  * handle commands in our primary channel
  */
-client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, text) {
+client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, text, message) {
 	if(text.charAt(0) == nconf.get('bot:command')) {
 		var split = text.slice(1).split(' ')
-		yukari.parseCommand(client, nconf.get('bot:primarychannel'), nick, split.shift(), split)
+		var command = split.shift()
+		if(command in yukari.message_hooked) {
+			for(var c in yukari.message_hooked) {
+				if(yukari.commands[yukari.message_hooked[command][c]].validate(command, split)) {
+					yukari.commands[yukari.message_hooked[command][c]].process(
+						function(message){
+							if(message == false) {
+								client.action(nconf.get('bot:primarychannel'), 'hiccups')
+							} else {
+								client.say(nconf.get('bot:primarychannel'), message)
+							}
+						},
+						nick,
+						command,
+						split
+					)
+				}
+			}
+		}
+		yukari.parseCommand(client, nconf.get('bot:primarychannel'), nick, command, split)
 	}
 })
 
