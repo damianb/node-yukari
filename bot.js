@@ -115,9 +115,10 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 		var split = text.slice(1).split(' ')
 		var command = split.shift()
 		if(command in yukari.message_hooked) {
-			for(var c in yukari.message_hooked) {
-				if(yukari.commands[yukari.message_hooked[command][c]].validateMessage(victim, split)) {
-					yukari.commands[yukari.message_hooked[command][c]].processMessage(
+			var stack = yukari.message_hooked[command]
+			for(var module in stack) {
+				if(yukari.commands[stack[module]].validateMessage(victim, split)) {
+					yukari.commands[stack[module]].processMessage(
 						function(message){
 							if(message == false) {
 								client.action(nconf.get('bot:primarychannel'), 'hiccups')
