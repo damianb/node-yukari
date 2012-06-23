@@ -32,12 +32,16 @@ nconf.defaults({
 		'owner'			:'unknown',
 		'command'		:'!',
 		'nickserv_pass'	:'',
-		'primarychannel':'#yukari'
+		'primarychannel':'#yukari',
+		'commands'		:[
+			'dice',
+			'die'
+		]
 	},
 	'irc':{
 		'address':'irc.oftc.net',
 		'port':6667,
-		'secure':false,
+		'secure':false
 	}
 })
 
@@ -53,6 +57,8 @@ var client = new irc.Client(nconf.get('irc:address'), nconf.get('bot:nick'), {
 	autoConnect: false,
 	stripColors: true
 })
+
+var bot = new yukari(client, nconf.get('bot:commands'))
 
 /**
  * display notices, messages, and pm's
