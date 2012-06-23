@@ -112,29 +112,26 @@ client.addListener('motd', function (motd) {
  */
 client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, text, message) {
 	if(text.charAt(0) == nconf.get('bot:command')) {
-		var split = text.slice(1).split(' ')
-		var command = split.shift()
+		var split = text.slice(1).split(' '),
+			command = split.shift(),
+			cb = function(message){
+					if(message == false) {
+						client.action(nconf.get('bot:primarychannel'), 'hiccups')
+					} else {
+						client.say(nconf.get('bot:primarychannel'), message)
+					}
+				}
+
 		if(command in yukari.message_hooked) {
 			var stack = yukari.message_hooked[command]
 			for(var module in stack) {
 				if(yukari.commands[stack[module]].validateMessage(victim, split)) {
-					yukari.commands[stack[module]].processMessage(
-						function(message){
-							if(message == false) {
-								client.action(nconf.get('bot:primarychannel'), 'hiccups')
-							} else {
-								client.say(nconf.get('bot:primarychannel'), message)
-							}
-						},
-						nick,
-						split
-					)
+					yukari.commands[stack[module]].processMessage.apply(this, [yukari, cb, nick].concat(split))
 				}
 			}
 		} else {
 			// @todo - magic commands / factoids
 		}
-		//yukari.parseCommand(client, nconf.get('bot:primarychannel'), nick, command, split)
 	}
 })
 

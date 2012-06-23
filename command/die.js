@@ -2,6 +2,7 @@ var nconf = require('nconf')
 
 // oh god what am i doing
 module.exports = {
+	// inherits core version
 	name:"die",
 	help:"terminates the bot",
 	longhelp:"",
@@ -12,20 +13,21 @@ module.exports = {
 		yukari.register('message', 'die', 'die')
 	},
 
-	validateMessage:function(victim, args) {
+	validateMessage:function(yukari, victim, args) {
+		// @todo owner validation of some sort
 		/*
 		if(victim != nconf) {
-
+			// asdf
 		}
 		*/
 
 		return true
 	},
 
-	processMessage:function(callback, victim, args) {
+	processMessage:function(yukari, callback, victim, args) {
 		callback('Bai!')
 
 		console.log('-!- TERMINATING')
-		client.disconnect('Yukari.js IRC bot - version ' + yukari.version())
+		yukari.client.disconnect('Yukari.js IRC bot - version ' + yukari.version())
 	}
 }

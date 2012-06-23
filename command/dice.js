@@ -1,17 +1,16 @@
-// oh god what am i doing
 module.exports = {
+	// inherits core version
 	name:"dice",
 	help:"rolls a specified dice and speaks the result",
 	longhelp:"",
 
-	version:"inherit",
-
 	register:function(yukari) {
+		console.log(yukari)
 		yukari.register('message', 'dice', 'dice')
 		yukari.register('message', 'dice', 'roll')
 	},
 
-	validateMessage:function(victim, args) {
+	validateMessage:function(yukari, victim, args) {
 		var match = args.match(/(\d+)\s*d\s*(\d+)(\s*[-+]\s*\d+)?(.*)/i)
 		if(match != null || match.length < 2) {
 			return true
@@ -19,7 +18,7 @@ module.exports = {
 		return false
 	},
 
-	processMessage:function(callback, victim, args) {
+	processMessage:function(yukari, callback, victim, args) {
 		var match = args.match(/(\d+)\s*d\s*(\d+)(\s*[-+]\s*\d+)?(.*)/i)
 		var number, sides, additional, rest
 
