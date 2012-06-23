@@ -14,17 +14,21 @@ function yukari(client, cmds) {
 		this.commands[cmds[c]] = require('./command/' + cmds[c])
 		this.commands[cmds[c]].register(yukari)
 	}
-
-	//asdf
 }
 
 yukari.prototype.register = function(type, name, sub) {
 	switch(type) {
 		case 'ctcp':
-			this.ctcp_hooked.push(name)
+			if(!sub in this.ctcp_hooked) {
+				this.ctcp_hooked[sub] = [];
+			}
+			this.ctcp_hooked[sub].push(name)
 			break;
 		case 'message':
-			this.message_hooked.push(name)
+			if(!sub in this.message_hooked) {
+				this.message_hooked[sub] = [];
+			}
+			this.message_hooked[sub].push(name)
 			break;
 		case 'sniff':
 			this.sniff_hooked.push(name)
