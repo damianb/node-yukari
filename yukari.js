@@ -67,6 +67,7 @@ yukari.prototype.grabYoutube = function(videoid, callback) {
 		})
 }
 
+/*
 yukari.rollDice = function(number, sides, additional, rest) {
 	var roll = 0
 	var rolls = []
@@ -174,5 +175,6 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 			console.log('debug: unknown command "' + command + '"')
 	}
 }
+*/
 
 module.exports = yukari
