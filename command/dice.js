@@ -3,7 +3,8 @@ module.exports = {
 	name:"dice",
 	help:"rolls a specified dice and speaks the result",
 	longhelp:"",
-	version:"0.0.1",
+
+	version:"inherit",
 
 	register:function(yukari) {
 		yukari.register('message', 'dice', 'dice')
