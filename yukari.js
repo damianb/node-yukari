@@ -12,20 +12,20 @@ function yukari(client, cmds) {
 
 	for(var c in cmds) {
 		this.commands[cmds[c]] = require('./command/' + cmds[c])
-		this.commands[cmds[c]].register(yukari)
+		this.commands[cmds[c]]['register'](this)
 	}
 }
 
 yukari.prototype.register = function(type, name, sub) {
 	switch(type) {
 		case 'ctcp':
-			if(!sub in this.ctcp_hooked) {
-				this.ctcp_hooked[sub] = [];
+			if(this.ctcp_hooked[sub] == undefined) {
+				this.ctcp_hooked[sub] = []
 			}
 			this.ctcp_hooked[sub].push(name)
 			break;
 		case 'message':
-			if(!sub in this.message_hooked) {
+			if(this.message_hooked[sub] == undefined) {
 				this.message_hooked[sub] = [];
 			}
 			this.message_hooked[sub].push(name)
@@ -177,4 +177,4 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 }
 */
 
-module.exports = yukari
+module.exports = { create:function(client, cmds) { return new yukari(client, cmds) } }

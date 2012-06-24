@@ -58,7 +58,7 @@ var client = new irc.Client(nconf.get('irc:address'), nconf.get('bot:nick'), {
 	stripColors: true
 })
 
-var bot = new yukari(client, nconf.get('bot:commands'))
+var bot = yukari.create(client, nconf.get('bot:commands'))
 
 /**
  * display notices, messages, and pm's
@@ -85,7 +85,7 @@ client.addListener('ctcp', function (from, to, text, type) {
 	console.log('CTCP ' + type + ': ' + from + ' (' + text + ')')
 	switch(text.toLowerCase()) {
 		case 'version':
-			var reply = 'Yukari.js IRC bot - version ' + yukari.version()
+			var reply = 'Yukari.js IRC bot - version ' + bot.version
 			console.log('CTCP REPLY VERSION: => ' + from + ' (' + reply + ')')
 			client.ctcp(from, 'VERSION', reply)
 			break;
@@ -122,11 +122,12 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 					}
 				}
 
-		if(command in yukari.message_hooked) {
-			var stack = yukari.message_hooked[command]
+		if(command in bot.message_hooked) {
+			var stack = bot.message_hooked[command]
 			for(var module in stack) {
-				if(yukari.commands[stack[module]].validateMessage(victim, split)) {
-					yukari.commands[stack[module]].processMessage.apply(this, [yukari, cb, nick].concat(split))
+				if(bot.commands[stack[module]].validateMessage.apply(this, [bot, nick, split])) {
+					console.log('calling module ' + stack[module])
+					bot.commands[stack[module]].processMessage.apply(this, [bot, cb, nick].concat(split))
 				}
 			}
 		} else {
