@@ -24,10 +24,10 @@ module.exports = {
 		return true
 	},
 
-	processMessage:function(yukari, callback, victim, args) {
+	processMessage:function(yukari, callback, victim) {
 		callback('Bai!')
 
 		console.log('-!- TERMINATING')
-		yukari.client.disconnect('Yukari.js IRC bot - version ' + yukari.version())
+		yukari.client.disconnect('Yukari.js IRC bot - version ' + yukari.version)
 	}
 }
