@@ -58,7 +58,7 @@ var client = new irc.Client(nconf.get('irc:address'), nconf.get('bot:nick'), {
 	stripColors: true
 })
 
-var bot = yukari.create(client, nconf.get('bot:commands'))
+var bot = yukari.construct(client, nconf.get('bot:commands'))
 
 /**
  * display notices, messages, and pm's
@@ -83,15 +83,34 @@ client.addListener('notice', function (from, to, text) {
  */
 client.addListener('ctcp', function (from, to, text, type) {
 	console.log('CTCP ' + type + ': ' + from + ' (' + text + ')')
-	switch(text.toLowerCase()) {
-		case 'version':
-			var reply = 'Yukari.js IRC bot - version ' + bot.version
-			console.log('CTCP REPLY VERSION: => ' + from + ' (' + reply + ')')
-			client.ctcp(from, 'VERSION', reply)
-			break;
-		default:
-			console.log('Unknown CTCP "' + text + '" from ' + from)
+
+	text = text.toLowerCase()
+	var cb = function(reply){
+			if(message != false) {
+				client.ctcp(from, text.toUpperCase(), reply)
+			}
+		}
+
+	if(command in bot.ctcp_hooked) {
+		var stack = bot.ctcp_hooked[command]
+		for(var module in stack) {
+			console.log('debug: calling module (ctcp) ' + stack[module]) // @debug
+			bot.commands[stack[module]].processCTCP.apply(bot.commands[stack[module]], [cb, from, to, text, type])
+		}
+	} else {
+		// @todo - magic ctcp handling?
+		console.log('Unknown CTCP "' + text + '" from ' + from)
 	}
+
+	//switch(text.toLowerCase()) {
+	//	case 'version':
+	//		var reply = 'Yukari.js IRC bot - version ' + bot.version
+	//		console.log('CTCP REPLY VERSION: => ' + from + ' (' + reply + ')')
+	//		client.ctcp(from, 'VERSION', reply)
+	//		break;
+	//	default:
+	//		console.log('Unknown CTCP "' + text + '" from ' + from)
+	//}
 })
 
 /**
@@ -125,9 +144,9 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 		if(command in bot.message_hooked) {
 			var stack = bot.message_hooked[command]
 			for(var module in stack) {
-				if(bot.commands[stack[module]].validateMessage.apply(this, [bot, nick, split])) {
-					console.log('calling module ' + stack[module])
-					bot.commands[stack[module]].processMessage.apply(this, [bot, cb, nick].concat(split))
+				if(bot.commands[stack[module]].validateMessage.apply(bot.commands[stack[module]], [nick].concat(split))) {
+					console.log('debug: calling module ' + stack[module]) // @debug
+					bot.commands[stack[module]].processMessage.apply(bot.commands[stack[module]], [cb, nick].concat(split))
 				}
 			}
 		} else {
@@ -138,9 +157,26 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 
 /**
  * non-command eavesdropping...
- *
+ */
 client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, text) {
 	if(text.charAt(0) != nconf.get('bot:command')) {
+		var cb = function(message){
+				if(message == false) {
+					client.action(nconf.get('bot:primarychannel'), 'hiccups')
+				} else {
+					client.say(nconf.get('bot:primarychannel'), message)
+				}
+			}
+
+		if(command in bot.sniff_hooked) {
+			for(var i in bot.sniff_hooked) {
+				var module = bot.sniff_hooked[i]
+				console.log('debug: calling module (sniff) ' + bot.sniff_hooked[i]) // @debug
+				bot.commands[module].processMessage.apply(bot.commands[module], [cb, nick, text])
+			}
+		}
+
+		/*
 		youtube = text.match(/http:\/\/(?:(?:www\.)?youtube\.com|youtu\.be)(?:\/watch\?v=|\/)([\w\-\_]+)/ig)
 		if(youtube != null) {
 			for(i in youtube) {
@@ -163,9 +199,9 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 				}
 			}
 		}
+		*/
 	}
 })
- */
 
 /**
  * runtime

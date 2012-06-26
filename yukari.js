@@ -10,9 +10,12 @@ function yukari(client, cmds) {
 	this.message_hooked = {}
 	this.sniff_hooked = []
 
+	var command
 	for(var c in cmds) {
-		this.commands[cmds[c]] = require('./command/' + cmds[c])
-		this.commands[cmds[c]]['register'](this)
+		console.log('loaded command module "' + cmds[c] + '"')
+		command = require('./command/' + cmds[c])
+		this.commands[cmds[c]] = command.construct(this)
+		this.commands[cmds[c]].register()
 	}
 }
 
@@ -177,4 +180,4 @@ yukari.parseCommand = function(client, channel, victim, command, args) {
 }
 */
 
-module.exports = { create:function(client, cmds) { return new yukari(client, cmds) } }
+module.exports = { construct:function(client, cmds) { return new yukari(client, cmds) } }
