@@ -162,7 +162,7 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 		for(var i in bot.sniff_hooked) {
 			var module = bot.sniff_hooked[i]
 			console.log('debug: calling module (sniff) ' + bot.sniff_hooked[i]) // @debug
-			bot.commands[module].processMessage.apply(bot.commands[module], [cb, nick, text])
+			bot.commands[module].processSniff.apply(bot.commands[module], [cb, nick, text])
 		}
 	}
 })
