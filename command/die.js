@@ -1,33 +1,31 @@
 var nconf = require('nconf')
 
-// oh god what am i doing
+function cmd_die(yukari) {
+	this.yukari = yukari
+
+	this.name = 'die'
+	this.help = 'terminates the bot'
+	this.longhelp = ''
+}
+
+cmd_die.prototype.register = function() {
+	this.yukari.register('message', this.name, 'die')
+}
+
+cmd_die.prototype.validateMessage = function(victim) {
+	return true
+}
+
+cmd_die.prototype.processMessage = function(callback, victim) {
+	callback('Bai!')
+
+	console.log('-!- TERMINATING')
+	console.log(this)
+	this.yukari.client.disconnect('Yukari.js IRC bot - version ' + this.yukari.version)
+}
+
 module.exports = {
-	// inherits core version
-	name:"die",
-	help:"terminates the bot",
-	longhelp:"",
-
-	version:"inherit",
-
-	register:function(yukari) {
-		yukari.register('message', 'die', 'die')
-	},
-
-	validateMessage:function(yukari, victim, args) {
-		// @todo owner validation of some sort
-		/*
-		if(victim != nconf) {
-			// asdf
-		}
-		*/
-
-		return true
-	},
-
-	processMessage:function(yukari, callback, victim) {
-		callback('Bai!')
-
-		console.log('-!- TERMINATING')
-		yukari.client.disconnect('Yukari.js IRC bot - version ' + yukari.version)
+	construct:function(yukari) {
+		return new cmd_die(yukari)
 	}
 }

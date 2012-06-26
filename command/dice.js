@@ -1,63 +1,71 @@
-module.exports = {
-	// inherits core version
-	name:"dice",
-	help:"rolls a specified dice and speaks the result",
-	longhelp:"",
+function cmd_dice(yukari) {
+	this.yukari = yukari
 
-	register:function(yukari) {
-		yukari.register('message', 'dice', 'dice')
-		yukari.register('message', 'dice', 'roll')
-	},
+	this.name = 'dice'
+	this.help = 'rolls a specified dice and speaks the result'
+	this.longhelp = ''
+}
 
-	validateMessage:function(yukari, victim, args) {
-		return false
-		args.join(' ')
-		var match = args.match(/(\d+)\s*d\s*(\d+)(\s*[-+]\s*\d+)?(.*)/i)
-		if(match != null || match.length < 2) {
-			return true
-		}
-		return false
-	},
+cmd_dice.prototype.register = function() {
+	this.yukari.register('message', this.name, 'roll')
+	this.yukari.register('message', this.name, 'dice')
+}
 
-	processMessage:function(yukari, callback, victim) {
-		var match = args.match(/(\d+)\s*d\s*(\d+)(\s*[-+]\s*\d+)?(.*)/i)
-		var number, sides, additional, rest
+cmd_dice.prototype.validateMessage = function(victim) {
+	return false
 
-		match.shift()
-		number = match.shift()
-		sides = match.shift()
-		if(match.length > 0) {
-			additional = match.shift()
-		}
-		if(match.length > 0) {
-			rest = _s.trim(match.join(''))
-		}
+	args.join(' ')
+	var match = args.match(/(\d+)\s*d\s*(\d+)(\s*[-+]\s*\d+)?(.*)/i)
+	if(match != null || match.length < 2) {
+		return true
+	}
+	return false
+}
 
-		if(additional) {
-			additional = _s.trim(additional).replace(' ', '')
-			if(additional.charAt(0) == '-') {
-				additional = parseInt(additional) * -1
-			} else {
-				additional = parseInt(additional)
-			}
-		}
+cmd_dice.prototype.processMessage = function(callback, victim) {
+	var match = args.match(/(\d+)\s*d\s*(\d+)(\s*[-+]\s*\d+)?(.*)/i)
+	var number, sides, additional, rest
 
-		var roll = 0, rolls = []
-		for(i = 0; i < number; i++) {
-			var t = 0
-			if(sides >= 1) {
-				t = Math.floor(Math.random() * sides) + 1
-				rolls.push(t)
-				roll += t
-			}
-		}
-		if(additional) {
-			roll += additional
-			result = number + 'd' + sides + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + ']' + ((additional > 0) ? ' +' : ' -') + ' ' + additional + ' totaling ' + roll
+	match.shift()
+	number = match.shift()
+	sides = match.shift()
+	if(match.length > 0) {
+		additional = match.shift()
+	}
+	if(match.length > 0) {
+		rest = _s.trim(match.join(''))
+	}
+
+	if(additional) {
+		additional = _s.trim(additional).replace(' ', '')
+		if(additional.charAt(0) == '-') {
+			additional = parseInt(additional) * -1
 		} else {
-			result = number + 'd' + sides + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + '] totaling ' + roll
+			additional = parseInt(additional)
 		}
+	}
 
-		callback(victim + ' rolls ' + result)
+	var roll = 0, rolls = []
+	for(i = 0; i < number; i++) {
+		var t = 0
+		if(sides >= 1) {
+			t = Math.floor(Math.random() * sides) + 1
+			rolls.push(t)
+			roll += t
+		}
+	}
+	if(additional) {
+		roll += additional
+		result = number + 'd' + sides + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + ']' + ((additional > 0) ? ' +' : ' -') + ' ' + additional + ' totaling ' + roll
+	} else {
+		result = number + 'd' + sides + (rest ? ' ' + rest : '') + ', got [' + rolls.join(',') + '] totaling ' + roll
+	}
+
+	callback(victim + ' rolls ' + result)
+}
+
+module.exports = {
+	construct:function(yukari) {
+		return new cmd_dice(yukari)
 	}
 }
