@@ -91,8 +91,8 @@ client.addListener('ctcp', function (from, to, text, type) {
 			}
 		}
 
-	if(command in bot.ctcp_hooked) {
-		var stack = bot.ctcp_hooked[command]
+	if(text in bot.ctcp_hooked) {
+		var stack = bot.ctcp_hooked[text]
 		for(var module in stack) {
 			console.log('debug: calling module (ctcp) ' + stack[module]) // @debug
 			bot.commands[stack[module]].processCTCP.apply(bot.commands[stack[module]], [cb, from, to, text, type])
