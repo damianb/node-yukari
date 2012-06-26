@@ -59,7 +59,7 @@ cmd_youtube.prototype.processSniff = function(callback, victim, text) {
 			}
 
 			if(videoid != false) {
-					yukari.grabYoutube(videoid, function(ret) {
+					this.grabYoutube(videoid, function(ret) {
 					if(ret !== false) {
 						callback(ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 					} else {
