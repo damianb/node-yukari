@@ -101,16 +101,6 @@ client.addListener('ctcp', function (from, to, text, type) {
 		// @todo - magic ctcp handling?
 		console.log('Unknown CTCP "' + text + '" from ' + from)
 	}
-
-	//switch(text.toLowerCase()) {
-	//	case 'version':
-	//		var reply = 'Yukari.js IRC bot - version ' + bot.version
-	//		console.log('CTCP REPLY VERSION: => ' + from + ' (' + reply + ')')
-	//		client.ctcp(from, 'VERSION', reply)
-	//		break;
-	//	default:
-	//		console.log('Unknown CTCP "' + text + '" from ' + from)
-	//}
 })
 
 /**
@@ -150,6 +140,7 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 				}
 			}
 		} else {
+			console.log('Unknown command "' + command + '"')
 			// @todo - magic commands / factoids
 		}
 	}
@@ -168,38 +159,11 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 				}
 			}
 
-		if(command in bot.sniff_hooked) {
-			for(var i in bot.sniff_hooked) {
-				var module = bot.sniff_hooked[i]
-				console.log('debug: calling module (sniff) ' + bot.sniff_hooked[i]) // @debug
-				bot.commands[module].processMessage.apply(bot.commands[module], [cb, nick, text])
-			}
+		for(var i in bot.sniff_hooked) {
+			var module = bot.sniff_hooked[i]
+			console.log('debug: calling module (sniff) ' + bot.sniff_hooked[i]) // @debug
+			bot.commands[module].processMessage.apply(bot.commands[module], [cb, nick, text])
 		}
-
-		/*
-		youtube = text.match(/http:\/\/(?:(?:www\.)?youtube\.com|youtu\.be)(?:\/watch\?v=|\/)([\w\-\_]+)/ig)
-		if(youtube != null) {
-			for(i in youtube) {
-				var videoid = false
-				var params = url.parse(youtube[i],true)
-				if(params['query']['v'] != null) {
-					videoid = params['query']['v']
-				} else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
-					videoid = params['path'].split('/')[1]
-				}
-
-				if(videoid != false) {
-						yukari.grabYoutube(videoid, function(ret) {
-						if(ret !== false) {
-							client.say(nconf.get('bot:primarychannel'), ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
-						} else {
-							client.action(nconf.get('bot:primarychannel'), 'hiccups')
-						}
-					})
-				}
-			}
-		}
-		*/
 	}
 })
 
