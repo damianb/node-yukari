@@ -86,7 +86,7 @@ client.addListener('ctcp', function (from, to, text, type) {
 
 	text = text.toLowerCase()
 	var cb = function(reply){
-			if(message != false) {
+			if(reply != false) {
 				client.ctcp(from, text.toUpperCase(), reply)
 			}
 		}
