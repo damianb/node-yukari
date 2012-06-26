@@ -79,6 +79,19 @@ client.addListener('notice', function (from, to, text) {
 })
 
 /**
+ * identify with nickserv
+ */
+client.addListener('motd', function (motd) {
+	console.log('-!- identifying to nickserv...')
+	if(nconf.get('bot:nickserv_pass')) {
+		client.say('NickServ', 'identify ' + nconf.get('bot:nickserv_pass'))
+
+		// for sec reasons, nuke this from memory
+		nconf.set('bot:nickserv_pass', '')
+	}
+})
+
+/**
  * handle ctcp responses
  */
 client.addListener('ctcp', function (from, to, text, type) {
@@ -100,19 +113,6 @@ client.addListener('ctcp', function (from, to, text, type) {
 	} else {
 		// @todo - magic ctcp handling?
 		console.log('Unknown CTCP "' + text + '" from ' + from)
-	}
-})
-
-/**
- * identify with nickserv
- */
-client.addListener('motd', function (motd) {
-	console.log('-!- identifying to nickserv...')
-	if(nconf.get('bot:nickserv_pass')) {
-		client.say('NickServ', 'identify ' + nconf.get('bot:nickserv_pass'))
-
-		// for sec reasons, nuke this from memory
-		nconf.set('bot:nickserv_pass', '')
 	}
 })
 
