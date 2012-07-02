@@ -1,6 +1,6 @@
 var nconf = require('nconf')
 
-function cmd_die(yukari) {
+function command(yukari) {
 	this.yukari = yukari
 
 	this.name = 'die'
@@ -8,15 +8,15 @@ function cmd_die(yukari) {
 	this.longhelp = ''
 }
 
-cmd_die.prototype.register = function() {
+command.prototype.register = function() {
 	this.yukari.register('message', this.name, 'die')
 }
 
-cmd_die.prototype.validateMessage = function(victim) {
+command.prototype.validateMessage = function(victim) {
 	return true
 }
 
-cmd_die.prototype.processMessage = function(callback, victim) {
+command.prototype.processMessage = function(callback, victim) {
 	callback('Bai!')
 
 	console.log('-!- TERMINATING')
@@ -26,6 +26,6 @@ cmd_die.prototype.processMessage = function(callback, victim) {
 
 module.exports = {
 	construct:function(yukari) {
-		return new cmd_die(yukari)
+		return new command(yukari)
 	}
 }

@@ -1,4 +1,4 @@
-function cmd_dice(yukari) {
+function command(yukari) {
 	this.yukari = yukari
 
 	this.name = 'dice'
@@ -6,12 +6,12 @@ function cmd_dice(yukari) {
 	this.longhelp = ''
 }
 
-cmd_dice.prototype.register = function() {
+command.prototype.register = function() {
 	this.yukari.register('message', this.name, 'roll')
 	this.yukari.register('message', this.name, 'dice')
 }
 
-cmd_dice.prototype.validateMessage = function(victim) {
+command.prototype.validateMessage = function(victim) {
 	return false
 
 	args.join(' ')
@@ -22,7 +22,7 @@ cmd_dice.prototype.validateMessage = function(victim) {
 	return false
 }
 
-cmd_dice.prototype.processMessage = function(callback, victim) {
+command.prototype.processMessage = function(callback, victim) {
 	var match = args.match(/(\d+)\s*d\s*(\d+)(\s*[-+]\s*\d+)?(.*)/i)
 	var number, sides, additional, rest
 
@@ -66,6 +66,6 @@ cmd_dice.prototype.processMessage = function(callback, victim) {
 
 module.exports = {
 	construct:function(yukari) {
-		return new cmd_dice(yukari)
+		return new command(yukari)
 	}
 }

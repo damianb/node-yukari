@@ -3,7 +3,7 @@ var https = require('https')
 var irc = require('irc')
 var url = require('url')
 
-function cmd_youtube(yukari) {
+function command(yukari) {
 	this.yukari = yukari
 
 	this.name = 'youtube'
@@ -11,12 +11,12 @@ function cmd_youtube(yukari) {
 	this.longhelp = ''
 }
 
-cmd_youtube.prototype.register = function() {
+command.prototype.register = function() {
 	this.yukari.register('message', this.name, 'youtube')
 	this.yukari.register('sniff', this.name)
 }
 
-cmd_youtube.prototype.validateMessage = function(victim, video) {
+command.prototype.validateMessage = function(victim, video) {
 	if(arguments.length < 2) {
 		// at some point, need to add a way to tell the sender to hang up and try again...
 		return false
@@ -36,7 +36,7 @@ cmd_youtube.prototype.validateMessage = function(victim, video) {
 	return (this.videoid != false) ? true : false
 }
 
-cmd_youtube.prototype.processMessage = function(callback, victim, video) {
+command.prototype.processMessage = function(callback, victim, video) {
 	this.grabYoutube(this.videoid, function(ret) {
 		if(ret !== false) {
 			callback(victim + ': ' + ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
@@ -46,7 +46,7 @@ cmd_youtube.prototype.processMessage = function(callback, victim, video) {
 	})
 }
 
-cmd_youtube.prototype.processSniff = function(callback, victim, text) {
+command.prototype.processSniff = function(callback, victim, text) {
 	youtube = text.match(/http:\/\/(?:(?:www\.)?youtube\.com|youtu\.be)(?:\/watch\?v=|\/)([\w\-\_]+)/ig)
 	if(youtube != null) {
 		for(i in youtube) {
@@ -71,7 +71,7 @@ cmd_youtube.prototype.processSniff = function(callback, victim, text) {
 	}
 }
 
-cmd_youtube.prototype.grabYoutube = function(videoid, callback) {
+command.prototype.grabYoutube = function(videoid, callback) {
 	// https://gdata.youtube.com/feeds/api/videos/$videoid?v=2&alt=json
 	var options = {
 		host: 'gdata.youtube.com',
@@ -110,6 +110,6 @@ cmd_youtube.prototype.grabYoutube = function(videoid, callback) {
 
 module.exports = {
 	construct:function(yukari) {
-		return new cmd_youtube(yukari)
+		return new command(yukari)
 	}
 }
