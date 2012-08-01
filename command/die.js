@@ -6,10 +6,18 @@ function command(yukari) {
 	this.name = 'die'
 	this.help = 'terminates the bot'
 	this.longhelp = ''
+
+	this.load()
 }
 
-command.prototype.register = function() {
-	this.yukari.register('message', this.name, 'die')
+command.prototype.load = function() {
+	this.yukari.on('command.die', this.processMessage)
+	this.enabled = true
+}
+
+command.prototype.unload = function() {
+	this.yukari.removeListener('command.die', this.processMessage)
+	this.enabled = false
 }
 
 command.prototype.validateMessage = function(victim) {
@@ -17,10 +25,10 @@ command.prototype.validateMessage = function(victim) {
 }
 
 command.prototype.processMessage = function(callback, victim) {
-	callback('Bai!')
+	if(!this.validateMessage(victim)) return
 
+	callback('Bai!')
 	console.log('-!- TERMINATING')
-	console.log(this)
 	this.yukari.client.disconnect('Yukari.js IRC bot - version ' + this.yukari.version)
 }
 
