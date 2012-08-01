@@ -10,13 +10,13 @@ command.prototype.init = function(yukari) {
 }
 
 command.prototype.load = function() {
-	command.yukari.on('command.source', command.processMessage)
-	command.enabled = true
+	this.yukari.on('command.source', this.processMessage)
+	this.enabled = true
 }
 
 command.prototype.unload = function() {
-	command.yukari.removeListener('command.source', command.processMessage)
-	command.enabled = false
+	this.yukari.removeListener('command.source', this.processMessage)
+	this.enabled = false
 }
 
 command.prototype.validateMessage = function(victim) {
@@ -29,4 +29,4 @@ command.prototype.processMessage = function(callback, victim) {
 	callback(victim + ': My source is available at <https://github.com/damianb/node-yukari>')
 }
 
-module.exports = new command()
+var c = module.exports = new command()

@@ -10,13 +10,13 @@ command.prototype.init = function(yukari) {
 }
 
 command.prototype.load = function() {
-	command.yukari.on('command.coin', command.processMessage)
-	command.enabled = true
+	this.yukari.on('command.coin', this.processMessage)
+	this.enabled = true
 }
 
 command.prototype.unload = function() {
-	command.yukari.removeListener('command.coin', command.processMessage)
-	command.enabled = false
+	this.yukari.removeListener('command.coin', this.processMessage)
+	this.enabled = false
 }
 
 command.prototype.validateMessage = function(victim) {
@@ -24,9 +24,9 @@ command.prototype.validateMessage = function(victim) {
 }
 
 command.prototype.processMessage = function(callback, victim) {
-	if(!command.validateMessage(victim)) return
+	if(!c.validateMessage(victim)) return
 
 	callback(victim + ': ' + (Math.round(Math.random()) ? 'heads' : 'tails'))
 }
 
-module.exports = new command()
+var c = module.exports = new command()

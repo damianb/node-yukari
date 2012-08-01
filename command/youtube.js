@@ -15,15 +15,15 @@ command.prototype.init = function(yukari) {
 }
 
 command.prototype.load = function() {
-	command.yukari.on('command.youtube', command.processMessage)
-	command.yukari.on('sniff', command.processSniff)
-	command.enabled = true
+	this.yukari.on('command.youtube', this.processMessage)
+	this.yukari.on('sniff', this.processSniff)
+	this.enabled = true
 }
 
 command.prototype.unload = function() {
-	command.yukari.removeListener('command.youtube', command.processMessage)
-	command.yukari.removeListener('sniff', command.processSniff)
-	command.enabled = false
+	this.yukari.removeListener('command.youtube', this.processMessage)
+	this.yukari.removeListener('sniff', this.processSniff)
+	this.enabled = false
 }
 
 command.prototype.validateMessage = function(victim, video) {
@@ -32,24 +32,24 @@ command.prototype.validateMessage = function(victim, video) {
 		return false
 	}
 
-	command.videoid = false
-	var params = url.parse(video ,true)
+	var videoid = false,
+		params = url.parse(video ,true)
 
 	if(params) {
 		if(params['query']['v'] != null) {
-			command.videoid = params['query']['v']
+			videoid = params['query']['v']
 		} else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
-			command.videoid = params['path'].split('/')[1]
+			videoid = params['path'].split('/')[1]
 		}
 	}
 
-	return (command.videoid != false) ? true : false
+	return (this.videoid != false) ? true : false
 }
 
 command.prototype.processMessage = function(callback, victim, video) {
-	if(!command.validateMessage(victim)) return
+	if(!c.validateMessage(victim)) return
 
-	command.grabYoutube(command.videoid, function(ret) {
+	c.grabYoutube(c.videoid, function(ret) {
 		if(ret !== false) {
 			callback(victim + ': ' + ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 		} else {
@@ -72,7 +72,7 @@ command.prototype.processSniff = function(callback, victim, text) {
 		}
 
 		if(videoid != false) {
-				command.grabYoutube(videoid, function(ret) {
+				this.grabYoutube(videoid, function(ret) {
 				if(ret !== false) {
 					callback(ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 				} else {
@@ -120,4 +120,4 @@ command.prototype.grabYoutube = function(videoid, callback) {
 	}
 }
 
-module.exports = new command()
+var c = module.exports = new command()

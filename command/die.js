@@ -26,11 +26,11 @@ command.prototype.validateMessage = function(victim) {
 }
 
 command.prototype.processMessage = function(callback, victim) {
-	if(!command.validateMessage(victim)) return
+	if(!c.validateMessage(victim)) return
 
 	callback('Bai!')
 	console.log('-!- TERMINATING')
-	command.yukari.client.disconnect('Yukari.js IRC bot - version ' + command.yukari.version)
+	c.yukari.client.disconnect('Yukari.js IRC bot - version ' + c.yukari.version)
 }
 
-module.exports = new command()
+var c = module.exports = new command()

@@ -35,4 +35,4 @@ command.prototype.processCTCP = function(callback, victim, target, ctcp, type) {
 	callback('Yukari.js IRC bot - version ' + command.yukari.version)
 }
 
-module.exports = new command()
+var c = module.exports = new command()
