@@ -28,11 +28,11 @@ command.prototype.validateMessage = function(victim) {
 command.prototype.processMessage = function(callback, victim) {
 	if(!c.validateMessage()) return
 
-	callback(victim + ': I am running Yukari.js IRC bot, version ' + command.yukari.version)
+	callback(victim + ': I am running Yukari.js IRC bot, version ' + c.yukari.version)
 }
 
 command.prototype.processCTCP = function(callback, victim, target, ctcp, type) {
-	callback('Yukari.js IRC bot - version ' + command.yukari.version)
+	callback('Yukari.js IRC bot - version ' + this.yukari.version)
 }
 
 var c = module.exports = new command()
