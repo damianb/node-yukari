@@ -13,7 +13,7 @@ var yukari = require('./yukari'),
 
 	// npm packages
 	_s = require('underscore.string'),
-	nconf = require('nconf'),
+	conf = require('nconf'),
 	url = require('url'),
 	irc = require('irc'),
 	//db = require('orm'),
@@ -24,9 +24,9 @@ EventEmitter = require('events').EventEmitter
 /**
  * configuration
  */
-nconf.argv().env()
-nconf.file({file: 'config.json'})
-nconf.defaults({
+conf.argv().env()
+conf.file({file: 'config.json'})
+conf.defaults({
 	'bot':{
 		'nick'			:'Yukari-chan',
 		'username'		:'Yukari',
@@ -50,17 +50,17 @@ nconf.defaults({
 /**
  * Prep for connection
  */
-var client = new irc.Client(nconf.get('irc:address'), nconf.get('bot:nick'), {
-	userName: nconf.get('bot:username'),
-	realName: nconf.get('bot:realname') + ' (owner: ' + nconf.get('bot:owner') + ')',
-	channels: [nconf.get('bot:primarychannel')],
-	port: nconf.get('irc:port'),
-	secure: nconf.get('irc:secure'),
+var client = new irc.Client(conf.get('irc:address'), conf.get('bot:nick'), {
+	userName: conf.get('bot:username'),
+	realName: conf.get('bot:realname') + ' (owner: ' + conf.get('bot:owner') + ')',
+	channels: [conf.get('bot:primarychannel')],
+	port: conf.get('irc:port'),
+	secure: conf.get('irc:secure'),
 	autoConnect: false,
 	stripColors: true
 })
 
-var bot = yukari.construct(client, nconf.get('bot:commands'))
+var bot = yukari.construct(client, conf.get('bot:commands'))
 
 /**
  * display notices, messages, and pm's
@@ -69,27 +69,28 @@ client.addListener('registered', function() {
 	console.log('-!- connection established')
 })
 client.addListener('message#', function (from, to, text) {
-	console.log(from + ' => ' + to + ': ' + text)
+	console.log('' + from + to + ': ' + text)
 })
 client.addListener('pm', function (nick, text) {
-	console.log(nick + ' => ~: ' + text)
+	console.log('  ' + nick + ': ' + text)
 })
 client.addListener('notice', function (from, to, text) {
 	if(from) {
-		console.log('NOTICE ' + from + ' => ' + to + ': ' + text)
+			console.log('NOTICE ' + from + ' => ' + to + ': ' + text)
 	}
 })
+
 
 /**
  * identify with nickserv
  */
 client.addListener('motd', function (motd) {
 	console.log('-!- identifying to nickserv...')
-	if(nconf.get('bot:nickserv_pass')) {
-		client.say('NickServ', 'identify ' + nconf.get('bot:nickserv_pass'))
+	if(conf.get('bot:nickserv_pass')) {
+		client.say('NickServ', 'identify ' + conf.get('bot:nickserv_pass'))
 
 		// for sec reasons, nuke this from memory
-		nconf.set('bot:nickserv_pass', '')
+		conf.set('bot:nickserv_pass', '')
 	}
 })
 
@@ -97,68 +98,58 @@ client.addListener('motd', function (motd) {
  * handle ctcp responses
  */
 client.addListener('ctcp', function (from, to, text, type) {
-	console.log('CTCP ' + type + ': ' + from + ' (' + text + ')')
+	console.log('CTCP ' + type + ': ' + from + '=>' + to + ' (' + text + ')')
 
 	text = text.toLowerCase()
 	var cb = function(reply){
 			if(reply != false) client.ctcp(from, text.toUpperCase(), reply)
 		}
 
-	if(text in bot.ctcp_hooked) {
-		var stack = bot.ctcp_hooked[text]
-		for(var module in stack) {
-			bot.commands[stack[module]].processCTCP.apply(bot.commands[stack[module]], [cb, from, to, text, type])
-		}
-	} else {
-		// @todo - magic ctcp handling?
-		console.log('Unknown CTCP "' + text + '" from ' + from)
-	}
+	bot.emit('ctcp.' + command, cb, from, to, text, type)
+
+	//if(text in bot.ctcp_hooked) {
+	//	var stack = bot.ctcp_hooked[text]
+	//	for(var module in stack) {
+	//		bot.commands[stack[module]].processCTCP.apply(bot.commands[stack[module]], [cb, from, to, text, type])
+	//	}
+	//} else {
+	//	// @todo - magic ctcp handling?
+	//	console.log('Unknown CTCP "' + text + '" from ' + from)
+	//}
 })
 
 /**
  * handle commands in our primary channel
  */
-client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, text, message) {
-	if(text.charAt(0) == nconf.get('bot:command')) {
+client.addListener('message' + conf.get('bot:primarychannel'), function (nick, text, message) {
+	if(text.charAt(0) == conf.get('bot:command')) {
 		var split = text.slice(1).split(' '),
 			command = split.shift(),
 			cb = function(message){
 					if(message == false) {
-						client.action(nconf.get('bot:primarychannel'), 'hiccups')
+						client.action(conf.get('bot:primarychannel'), 'hiccups')
 					} else {
-						client.say(nconf.get('bot:primarychannel'), message)
+						client.say(conf.get('bot:primarychannel'), message)
 					}
 				}
-		bot.emit('command.' + command, nick, split, cb)
-
-		if(command in bot.message_hooked) {
-			var stack = bot.message_hooked[command]
-			for(var module in stack) {
-				if(bot.commands[stack[module]].validateMessage.apply(bot.commands[stack[module]], [nick].concat(split))) {
-					bot.commands[stack[module]].processMessage.apply(bot.commands[stack[module]], [cb, nick].concat(split))
-				}
-			}
-		} else {
-			console.log('Unknown command "' + command + '"')
-			// @todo - magic commands / factoids
-		}
+		bot.apply('emit', ['command.' + command, cb, nick].concat(split))
 	}
 })
 
 /**
  * non-command eavesdropping...
  */
-client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, text) {
-	if(text.charAt(0) != nconf.get('bot:command')) {
+client.addListener('message' + conf.get('bot:primarychannel'), function (nick, text) {
+	if(text.charAt(0) != conf.get('bot:command')) {
 		var cb = function(message){
 				if(message == false) {
-					client.action(nconf.get('bot:primarychannel'), 'hiccups')
+					client.action(conf.get('bot:primarychannel'), 'hiccups')
 				} else {
-					client.say(nconf.get('bot:primarychannel'), message)
+					client.say(conf.get('bot:primarychannel'), message)
 				}
 			}
 
-		bot.emit('sniff', nick, text, cb)
+		bot.emit('sniff', cb, nick, text)
 	}
 })
 
@@ -166,3 +157,4 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
  * runtime
  */
 client.connect()
+console.log('Starting up Yukari...')
