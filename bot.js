@@ -123,7 +123,7 @@ client.addListener('message' + conf.get('bot:primarychannel'), function (nick, t
 						client.say(conf.get('bot:primarychannel'), message)
 					}
 				}
-		bot.apply('emit', ['command.' + command, cb, nick].concat(split))
+		bot.emit.apply(bot, ['command.' + command, cb, nick].concat(split))
 	}
 })
 
