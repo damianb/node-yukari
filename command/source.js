@@ -24,7 +24,7 @@ command.prototype.validateMessage = function(victim) {
 }
 
 command.prototype.processMessage = function(callback, victim) {
-	if(!command.validateMessage()) return
+	if(!c.validateMessage()) return
 
 	callback(victim + ': My source is available at <https://github.com/damianb/node-yukari>')
 }

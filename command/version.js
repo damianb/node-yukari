@@ -26,7 +26,7 @@ command.prototype.validateMessage = function(victim) {
 }
 
 command.prototype.processMessage = function(callback, victim) {
-	if(!this.validateMessage()) return
+	if(!c.validateMessage()) return
 
 	callback(victim + ': I am running Yukari.js IRC bot, version ' + command.yukari.version)
 }
