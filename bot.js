@@ -106,7 +106,7 @@ client.addListener('ctcp', function (from, to, text, type) {
 			if(reply != false) client.ctcp(from, text.toUpperCase(), reply)
 		}
 
-	bot.emit('ctcp.' + type, cb, from, to, text, type)
+	bot.emit('ctcp.' + text, cb, from, to, text, type)
 })
 
 /**
