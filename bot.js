@@ -106,17 +106,7 @@ client.addListener('ctcp', function (from, to, text, type) {
 			if(reply != false) client.ctcp(from, text.toUpperCase(), reply)
 		}
 
-	bot.emit('ctcp.' + command, cb, from, to, text, type)
-
-	//if(text in bot.ctcp_hooked) {
-	//	var stack = bot.ctcp_hooked[text]
-	//	for(var module in stack) {
-	//		bot.commands[stack[module]].processCTCP.apply(bot.commands[stack[module]], [cb, from, to, text, type])
-	//	}
-	//} else {
-	//	// @todo - magic ctcp handling?
-	//	console.log('Unknown CTCP "' + text + '" from ' + from)
-	//}
+	bot.emit('ctcp.' + type, cb, from, to, text, type)
 })
 
 /**
