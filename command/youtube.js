@@ -72,7 +72,7 @@ command.prototype.processSniff = function(callback, victim, text) {
 		}
 
 		if(videoid != false) {
-				this.grabYoutube(videoid, function(ret) {
+				c.grabYoutube(videoid, function(ret) {
 				if(ret !== false) {
 					callback(ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 				} else {

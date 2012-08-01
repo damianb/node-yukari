@@ -32,7 +32,7 @@ command.prototype.processMessage = function(callback, victim) {
 }
 
 command.prototype.processCTCP = function(callback, victim, target, ctcp, type) {
-	callback('Yukari.js IRC bot - version ' + this.yukari.version)
+	callback('Yukari.js IRC bot - version ' + c.yukari.version)
 }
 
 var c = module.exports = new command()
