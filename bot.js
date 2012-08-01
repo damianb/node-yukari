@@ -19,6 +19,8 @@ var yukari = require('./yukari'),
 	//db = require('orm'),
 	colors = irc.colors
 
+EventEmitter = require('events').EventEmitter
+
 /**
  * configuration
  */
@@ -99,15 +101,12 @@ client.addListener('ctcp', function (from, to, text, type) {
 
 	text = text.toLowerCase()
 	var cb = function(reply){
-			if(reply != false) {
-				client.ctcp(from, text.toUpperCase(), reply)
-			}
+			if(reply != false) client.ctcp(from, text.toUpperCase(), reply)
 		}
 
 	if(text in bot.ctcp_hooked) {
 		var stack = bot.ctcp_hooked[text]
 		for(var module in stack) {
-			console.log('debug: calling module (ctcp) ' + stack[module]) // @debug
 			bot.commands[stack[module]].processCTCP.apply(bot.commands[stack[module]], [cb, from, to, text, type])
 		}
 	} else {
@@ -130,12 +129,12 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 						client.say(nconf.get('bot:primarychannel'), message)
 					}
 				}
+		bot.emit('command.' + command, nick, split, cb)
 
 		if(command in bot.message_hooked) {
 			var stack = bot.message_hooked[command]
 			for(var module in stack) {
 				if(bot.commands[stack[module]].validateMessage.apply(bot.commands[stack[module]], [nick].concat(split))) {
-					console.log('debug: calling module ' + stack[module]) // @debug
 					bot.commands[stack[module]].processMessage.apply(bot.commands[stack[module]], [cb, nick].concat(split))
 				}
 			}
@@ -159,11 +158,7 @@ client.addListener('message' + nconf.get('bot:primarychannel'), function (nick, 
 				}
 			}
 
-		for(var i in bot.sniff_hooked) {
-			var module = bot.sniff_hooked[i]
-			console.log('debug: calling module (sniff) ' + bot.sniff_hooked[i]) // @debug
-			bot.commands[module].processSniff.apply(bot.commands[module], [cb, nick, text])
-		}
+		bot.emit('sniff', nick, text, cb)
 	}
 })
 

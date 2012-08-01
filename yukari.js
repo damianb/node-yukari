@@ -1,22 +1,23 @@
-var _s = require('underscore.string')
-var https = require('https')
-var irc = require('irc')
+var _s = require('underscore.string'),
+	https = require('https'),
+	irc = require('irc'),
+	util = require('util'),
+	EventEmitter = require('events').EventEmitter
+
+util.inherits(yukari, EventEmitter)
 
 function yukari(client, cmds) {
-	this.version = '0.0.2'
+	this.version = '0.0.4'
 	this.client = client
 	this.commands = {}
-	this.ctcp_hooked = {}
-	this.message_hooked = {}
-	this.sniff_hooked = []
+	//this.ctcp_hooked = {}
+	//this.message_hooked = {}
+	//this.sniff_hooked = []
 
-	var command
-	for(var c in cmds) {
-		console.log('loaded command module "' + cmds[c] + '"')
-		command = require('./command/' + cmds[c])
-		this.commands[cmds[c]] = command.construct(this)
-		this.commands[cmds[c]].register()
-	}
+	cmds.forEach(function(val, key, ar) {
+		console.log('loading module "' + value + '"')
+		this.commands[value] = require('./command/' + value).construct(this)
+	})
 }
 
 yukari.prototype.register = function(type, name, sub) {
