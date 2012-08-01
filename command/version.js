@@ -1,30 +1,41 @@
-function cmd_version(yukari) {
+function command(yukari) {
 	this.yukari = yukari
 
 	this.name = 'version'
 	this.help = 'identifies the current version of yukari.js in use'
 	this.longhelp = ''
+
+	this.load()
 }
 
-cmd_version.prototype.register = function() {
-	this.yukari.register('ctcp', this.name, 'version')
-	this.yukari.register('message', this.name, 'version')
+command.prototype.load = function() {
+	this.yukari.on('ctcp.version', this.processCTCP)
+	this.yukari.on('command.version', this.processMessage)
+	this.enabled = true
 }
 
-cmd_version.prototype.validateMessage = function(victim) {
+command.prototype.unload = function() {
+	this.yukari.removeListener('ctcp.version', this.processCTCP)
+	this.yukari.removeListener('command.version', this.processMessage)
+	this.enabled = false
+}
+
+command.prototype.validateMessage = function(victim) {
 	return true
 }
 
-cmd_version.prototype.processMessage = function(callback, victim) {
+command.prototype.processMessage = function(callback, victim) {
+	if(!this.validateMessage()) return
+
 	callback(victim + ': I am running Yukari.js IRC bot, version ' + this.yukari.version)
 }
 
-cmd_version.prototype.processCTCP = function(callback, victim, target, ctcp, type) {
+command.prototype.processCTCP = function(callback, victim, target, ctcp, type) {
 	callback('Yukari.js IRC bot - version ' + this.yukari.version)
 }
 
 module.exports = {
 	construct:function(yukari) {
-		return new cmd_version(yukari)
+		return new command(yukari)
 	}
 }
