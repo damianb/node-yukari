@@ -11,9 +11,10 @@ function yukari(client, cmds) {
 	this.client = client
 	this.commands = {}
 
+	var yukari = this
 	cmds.forEach(function(val, key, ar) {
 		console.log('loading module "' + val + '"')
-		this.commands[val] = require('./command/' + val).construct(this)
+		yukari.commands[val] = require('./command/' + val).construct(yukari)
 	})
 }
 
