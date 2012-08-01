@@ -1,10 +1,11 @@
-function command(yukari) {
-	this.yukari = yukari
-
+function command() {
 	this.name = 'coin'
 	this.help = 'flips a coin, guaranteed to possibly be random'
 	this.longhelp = ''
+}
 
+command.prototype.init = function(yukari) {
+	this.yukari = yukari
 	this.load()
 }
 
@@ -28,8 +29,4 @@ command.prototype.processMessage = function(callback, victim) {
 	callback(victim + ': ' + (Math.round(Math.random()) ? 'heads' : 'tails'))
 }
 
-module.exports = {
-	construct:function(yukari) {
-		return new command(yukari)
-	}
-}
+module.exports = new command()

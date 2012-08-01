@@ -1,12 +1,13 @@
-var nconf = require('nconf')
+var conf = require('nconf')
 
-function command(yukari) {
-	this.yukari = yukari
-
+function command() {
 	this.name = 'die'
 	this.help = 'terminates the bot'
 	this.longhelp = ''
+}
 
+command.prototype.init = function(yukari) {
+	this.yukari = yukari
 	this.load()
 }
 
@@ -32,8 +33,4 @@ command.prototype.processMessage = function(callback, victim) {
 	command.yukari.client.disconnect('Yukari.js IRC bot - version ' + command.yukari.version)
 }
 
-module.exports = {
-	construct:function(yukari) {
-		return new command(yukari)
-	}
-}
+module.exports = new command()

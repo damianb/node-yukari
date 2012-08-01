@@ -3,13 +3,14 @@ var https = require('https')
 var irc = require('irc')
 var url = require('url')
 
-function command(yukari) {
-	this.yukari = yukari
-
+function command() {
 	this.name = 'youtube'
 	this.help = 'provides various information about youtube videos on demand'
 	this.longhelp = ''
+}
 
+command.prototype.init = function(yukari) {
+	this.yukari = yukari
 	this.load()
 }
 
@@ -119,8 +120,4 @@ command.prototype.grabYoutube = function(videoid, callback) {
 	}
 }
 
-module.exports = {
-	construct:function(yukari) {
-		return new command(yukari)
-	}
-}
+module.exports = new command()

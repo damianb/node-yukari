@@ -1,10 +1,11 @@
-function command(yukari) {
-	this.yukari = yukari
-
+function command() {
 	this.name = 'source'
 	this.help = 'provides a link to the yukari.js source code'
 	this.longhelp = ''
+}
 
+command.prototype.init = function(yukari) {
+	this.yukari = yukari
 	this.load()
 }
 
@@ -28,8 +29,4 @@ command.prototype.processMessage = function(callback, victim) {
 	callback(victim + ': My source is available at <https://github.com/damianb/node-yukari>')
 }
 
-module.exports = {
-	construct:function(yukari) {
-		return new command(yukari)
-	}
-}
+module.exports = new command()
