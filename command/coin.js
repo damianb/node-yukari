@@ -9,13 +9,13 @@ function command(yukari) {
 }
 
 command.prototype.load = function() {
-	this.yukari.on('command.coin', this.processMessage)
-	this.enabled = true
+	command.yukari.on('command.coin', command.processMessage)
+	command.enabled = true
 }
 
 command.prototype.unload = function() {
-	this.yukari.removeListener('command.coin', this.processMessage)
-	this.enabled = false
+	command.yukari.removeListener('command.coin', command.processMessage)
+	command.enabled = false
 }
 
 command.prototype.validateMessage = function(victim) {
@@ -23,7 +23,7 @@ command.prototype.validateMessage = function(victim) {
 }
 
 command.prototype.processMessage = function(callback, victim) {
-	if(!this.validateMessage(victim)) return
+	if(!command.validateMessage(victim)) return
 
 	callback(victim + ': ' + (Math.round(Math.random()) ? 'heads' : 'tails'))
 }

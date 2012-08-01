@@ -11,13 +11,13 @@ function command(yukari) {
 }
 
 command.prototype.load = function() {
-	this.yukari.on('command.die', this.processMessage)
-	this.enabled = true
+	command.yukari.on('command.die', command.processMessage)
+	command.enabled = true
 }
 
 command.prototype.unload = function() {
-	this.yukari.removeListener('command.die', this.processMessage)
-	this.enabled = false
+	command.yukari.removeListener('command.die', command.processMessage)
+	command.enabled = false
 }
 
 command.prototype.validateMessage = function(victim) {
@@ -25,11 +25,11 @@ command.prototype.validateMessage = function(victim) {
 }
 
 command.prototype.processMessage = function(callback, victim) {
-	if(!this.validateMessage(victim)) return
+	if(!command.validateMessage(victim)) return
 
 	callback('Bai!')
 	console.log('-!- TERMINATING')
-	this.yukari.client.disconnect('Yukari.js IRC bot - version ' + this.yukari.version)
+	command.yukari.client.disconnect('Yukari.js IRC bot - version ' + command.yukari.version)
 }
 
 module.exports = {

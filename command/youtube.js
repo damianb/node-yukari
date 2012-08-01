@@ -14,15 +14,15 @@ function command(yukari) {
 }
 
 command.prototype.load = function() {
-	this.yukari.on('command.youtube', this.processMessage)
-	this.yukari.on('sniff', this.processSniff)
-	this.enabled = true
+	command.yukari.on('command.youtube', command.processMessage)
+	command.yukari.on('sniff', command.processSniff)
+	command.enabled = true
 }
 
 command.prototype.unload = function() {
-	this.yukari.removeListener('command.youtube', this.processMessage)
-	this.yukari.removeListener('sniff', this.processSniff)
-	this.enabled = false
+	command.yukari.removeListener('command.youtube', command.processMessage)
+	command.yukari.removeListener('sniff', command.processSniff)
+	command.enabled = false
 }
 
 command.prototype.validateMessage = function(victim, video) {
@@ -31,24 +31,24 @@ command.prototype.validateMessage = function(victim, video) {
 		return false
 	}
 
-	this.videoid = false
+	command.videoid = false
 	var params = url.parse(video ,true)
 
 	if(params) {
 		if(params['query']['v'] != null) {
-			this.videoid = params['query']['v']
+			command.videoid = params['query']['v']
 		} else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
-			this.videoid = params['path'].split('/')[1]
+			command.videoid = params['path'].split('/')[1]
 		}
 	}
 
-	return (this.videoid != false) ? true : false
+	return (command.videoid != false) ? true : false
 }
 
 command.prototype.processMessage = function(callback, victim, video) {
-	if(!this.validateMessage(victim)) return
+	if(!command.validateMessage(victim)) return
 
-	this.grabYoutube(this.videoid, function(ret) {
+	command.grabYoutube(command.videoid, function(ret) {
 		if(ret !== false) {
 			callback(victim + ': ' + ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 		} else {
@@ -71,7 +71,7 @@ command.prototype.processSniff = function(callback, victim, text) {
 		}
 
 		if(videoid != false) {
-				this.grabYoutube(videoid, function(ret) {
+				command.grabYoutube(videoid, function(ret) {
 				if(ret !== false) {
 					callback(ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 				} else {
