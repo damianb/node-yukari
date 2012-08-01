@@ -9,11 +9,20 @@ function command(yukari) {
 	this.name = 'youtube'
 	this.help = 'provides various information about youtube videos on demand'
 	this.longhelp = ''
+
+	this.load()
 }
 
-command.prototype.register = function() {
-	this.yukari.register('message', this.name, 'youtube')
-	this.yukari.register('sniff', this.name)
+command.prototype.load = function() {
+	this.yukari.on('command.youtube', this.processMessage)
+	this.yukari.on('sniff', this.processSniff)
+	this.enabled = true
+}
+
+command.prototype.unload = function() {
+	this.yukari.removeListener('command.youtube', this.processMessage)
+	this.yukari.removeListener('sniff', this.processSniff)
+	this.enabled = false
 }
 
 command.prototype.validateMessage = function(victim, video) {
@@ -37,6 +46,8 @@ command.prototype.validateMessage = function(victim, video) {
 }
 
 command.prototype.processMessage = function(callback, victim, video) {
+	if(!this.validateMessage(victim)) return
+
 	this.grabYoutube(this.videoid, function(ret) {
 		if(ret !== false) {
 			callback(victim + ': ' + ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
@@ -48,25 +59,25 @@ command.prototype.processMessage = function(callback, victim, video) {
 
 command.prototype.processSniff = function(callback, victim, text) {
 	youtube = text.match(/http:\/\/(?:(?:www\.)?youtube\.com|youtu\.be)(?:\/watch\?v=|\/)([\w\-\_]+)/ig)
-	if(youtube != null) {
-		for(i in youtube) {
-			var videoid = false
-			var params = url.parse(youtube[i],true)
-			if(params['query']['v'] != null) {
-				videoid = params['query']['v']
-			} else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
-				videoid = params['path'].split('/')[1]
-			}
+	if(youtube == null) return
 
-			if(videoid != false) {
-					this.grabYoutube(videoid, function(ret) {
-					if(ret !== false) {
-						callback(ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
-					} else {
-						callback(false)
-					}
-				})
-			}
+	for(i in youtube) {
+		var videoid = false
+		var params = url.parse(youtube[i],true)
+		if(params['query']['v'] != null) {
+			videoid = params['query']['v']
+		} else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
+			videoid = params['path'].split('/')[1]
+		}
+
+		if(videoid != false) {
+				this.grabYoutube(videoid, function(ret) {
+				if(ret !== false) {
+					callback(ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
+				} else {
+					callback(false)
+				}
+			})
 		}
 	}
 }
