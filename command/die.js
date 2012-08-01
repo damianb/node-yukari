@@ -12,13 +12,13 @@ command.prototype.init = function(yukari) {
 }
 
 command.prototype.load = function() {
-	command.yukari.on('command.die', command.processMessage)
-	command.enabled = true
+	this.yukari.on('command.die', this.processMessage)
+	this.enabled = true
 }
 
 command.prototype.unload = function() {
-	command.yukari.removeListener('command.die', command.processMessage)
-	command.enabled = false
+	this.yukari.removeListener('command.die', this.processMessage)
+	this.enabled = false
 }
 
 command.prototype.validateMessage = function(victim) {
