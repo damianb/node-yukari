@@ -36,7 +36,8 @@ conf.defaults({
 		'nickserv_pass'	:'',
 		'primarychannel':'#yukari',
 		'commands'		:[
-			'dice',
+			'version',
+			'source',
 			'die'
 		]
 	},
