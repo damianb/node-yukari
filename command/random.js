@@ -1,25 +1,54 @@
-function cmd_random(yukari) {
-	this.yukari = yukari
-
+function command() {
 	this.name = 'random'
-	this.help = 'returns a random number, guaranteed to be random as per RFC 1149.5' // http://xkcd.com/221/
-	this.longhelp = ''
+	this.provides = [
+		{
+			command:	'coin',
+			help:		'flips a coin, guaranteed to possibly be random',
+			longhelp:	''
+		},
+		{
+			command:	'random',
+			help:		'returns a random number, guaranteed to be random as per RFC 1149.5', // http://xkcd.com/221/
+			longhelp:	''
+		}
+	]
 }
 
-cmd_random.prototype.register = function() {
-	this.yukari.register('message', this.name, 'random')
+command.prototype.init = function(yukari) {
+	this.yukari = yukari
+	this.load()
 }
 
-cmd_random.prototype.validateMessage = function(victim) {
+command.prototype.load = function() {
+	this.yukari.on('command.coin', this.procCoin)
+	this.yukari.on('command.random', this.procRandom)
+	this.enabled = true
+}
+
+command.prototype.unload = function() {
+	this.yukari.removeListener('command.coin', this.procCoin)
+	this.yukari.removeListener('command.random', this.procRandom)
+	this.enabled = false
+}
+
+command.prototype.valRandom = function(victim) {
 	return true
 }
 
-cmd_random.prototype.processMessage = function(callback, victim) {
+command.prototype.procRandom = function(callback, victim) {
+	if(!c.valRandom(victim)) return
+
 	callback(victim + ': 4')
 }
 
-module.exports = {
-	construct:function(yukari) {
-		return new cmd_random(yukari)
-	}
+command.prototype.valCoin = function(victim) {
+	return true
 }
+
+command.prototype.procCoin = function(callback, victim) {
+	if(!c.valCoin(victim)) return
+
+	callback(victim + ': ' + (Math.round(Math.random()) ? 'heads' : 'tails'))
+}
+
+var c = module.exports = new command()
