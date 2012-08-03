@@ -36,9 +36,9 @@ conf.defaults({
 		'nickserv_pass'	:'',
 		'primarychannel':'#yukari',
 		'commands'		:[
-			'version',
-			'source',
-			'die'
+			'core',
+			'random',
+			'to'
 		]
 	},
 	'irc':{
@@ -123,7 +123,12 @@ client.addListener('message' + conf.get('bot:primarychannel'), function (nick, t
 						client.say(conf.get('bot:primarychannel'), message)
 					}
 				}
-		bot.emit.apply(bot, ['command.' + command, cb, nick].concat(split))
+		if(bot.listeners('command.' + command).length == 0) {
+			// invalid command!
+			//bot.emit.apply(bot, ['command..null', cb, nick, command].concat(split))
+		} else {
+			bot.emit.apply(bot, ['command.' + command, cb, nick].concat(split))
+		}
 	}
 })
 
