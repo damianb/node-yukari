@@ -5,8 +5,13 @@ var url = require('url')
 
 function command() {
 	this.name = 'youtube'
-	this.help = 'provides various information about youtube videos on demand'
-	this.longhelp = ''
+	this.provides = [
+		{
+			command:	'youtube',
+			help:		'provides various information about youtube videos on demand',
+			longhelp:	''
+		}
+	]
 }
 
 command.prototype.init = function(yukari) {
@@ -15,25 +20,20 @@ command.prototype.init = function(yukari) {
 }
 
 command.prototype.load = function() {
-	this.yukari.on('command.youtube', this.processMessage)
-	this.yukari.on('sniff', this.processSniff)
+	this.yukari.on('command.youtube', this.procYoutube)
+	this.yukari.on('sniff', this.procSniff)
 	this.enabled = true
 }
 
 command.prototype.unload = function() {
-	this.yukari.removeListener('command.youtube', this.processMessage)
-	this.yukari.removeListener('sniff', this.processSniff)
+	this.yukari.removeListener('command.youtube', this.procYoutube)
+	this.yukari.removeListener('sniff', this.procSniff)
 	this.enabled = false
 }
 
-command.prototype.validateMessage = function(victim, video) {
-	if(arguments.length < 2) {
-		// at some point, need to add a way to tell the sender to hang up and try again...
-		return false
-	}
-
+command.prototype.extractVidID = function(uri) {
 	var videoid = false,
-		params = url.parse(video ,true)
+		params = url.parse(uri ,true)
 
 	if(params) {
 		if(params['query']['v'] != null) {
@@ -43,13 +43,16 @@ command.prototype.validateMessage = function(victim, video) {
 		}
 	}
 
-	return (this.videoid != false) ? true : false
+	return videoid
 }
 
-command.prototype.processMessage = function(callback, victim, video) {
-	if(!c.validateMessage(victim)) return
+command.prototype.procYoutube = function(callback, victim, video) {
+	if(arguments.length < 2) return
 
-	c.grabYoutube(c.videoid, function(ret) {
+	var videoid = c.extractVidID(video)
+	if(!videoid) return
+
+	c.grabYoutube(videoid, function(ret) {
 		if(ret !== false) {
 			callback(victim + ': ' + ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 		} else {
@@ -58,21 +61,15 @@ command.prototype.processMessage = function(callback, victim, video) {
 	})
 }
 
-command.prototype.processSniff = function(callback, victim, text) {
+command.prototype.procSniff = function(callback, victim, text) {
 	youtube = text.match(/http:\/\/(?:(?:www\.)?youtube\.com|youtu\.be)(?:\/watch\?v=|\/)([\w\-\_]+)/ig)
 	if(youtube == null) return
 
-	for(i in youtube) {
-		var videoid = false
-		var params = url.parse(youtube[i],true)
-		if(params['query']['v'] != null) {
-			videoid = params['query']['v']
-		} else if(params['hostname'] == 'youtu.be' && params['path'] != null) {
-			videoid = params['path'].split('/')[1]
-		}
-
+	// @todo check if this is blocking
+	youtube.forEach(function(uri, key, ar) {
+		var videoid = c.extractVidID(uri)
 		if(videoid != false) {
-				c.grabYoutube(videoid, function(ret) {
+			c.grabYoutube(videoid, function(ret) {
 				if(ret !== false) {
 					callback(ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 				} else {
@@ -80,7 +77,7 @@ command.prototype.processSniff = function(callback, victim, text) {
 				}
 			})
 		}
-	}
+	})
 }
 
 command.prototype.grabYoutube = function(videoid, callback) {
