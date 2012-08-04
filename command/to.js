@@ -11,7 +11,7 @@ function command(yukari) {
 }
 
 command.prototype.load = function() {
-	this.yukari.on('command.to', this.procCoin)
+	this.yukari.on('command.to', this.procTo)
 	this.enabled = true
 }
 
