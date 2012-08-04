@@ -76,9 +76,7 @@ client.addListener('pm', function (nick, text) {
 	console.log('  ' + nick + ': ' + text)
 })
 client.addListener('notice', function (from, to, text) {
-	if(from) {
-			console.log('NOTICE ' + from + ' => ' + to + ': ' + text)
-	}
+	if(from) console.log('NOTICE ' + from + ' => ' + to + ': ' + text)
 })
 
 
@@ -125,7 +123,7 @@ client.addListener('message' + conf.get('bot:primarychannel'), function (nick, t
 				}
 		if(bot.listeners('command.' + command).length == 0) {
 			// invalid command!
-			//bot.emit.apply(bot, ['command..null', cb, nick, command].concat(split))
+			bot.emit.apply(bot, ['command..null', cb, nick, command].concat(split))
 		} else {
 			bot.emit.apply(bot, ['command.' + command, cb, nick].concat(split))
 		}
