@@ -1,7 +1,4 @@
-var _s = require('underscore.string'),
-	https = require('https'),
-	irc = require('irc'),
-	util = require('util'),
+var util = require('util'),
 	EventEmitter = require('events').EventEmitter
 
 util.inherits(yukari, EventEmitter)
