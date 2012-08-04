@@ -7,7 +7,7 @@ var _s = require('underscore.string'),
 util.inherits(yukari, EventEmitter)
 
 function yukari(client, cmds) {
-	this.version = '0.0.4'
+	this.version = '0.1.0'
 	this.client = client
 	this.commands = {}
 

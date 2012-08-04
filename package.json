@@ -3,13 +3,13 @@
   "description": "Port of Yukari IRC bot to node.js",
   "author": "Damian Bushong <katana@codebite.net>",
   "licenses": { "type": "MIT" },
-  "version": "0.0.2",
+  "version": "0.1.0",
   "dependencies": {
     "irc": "0.3.x",
     "url": "0.4.x",
 	"nconf": "0.6.x",
-    "underscore.string": "2.2.x"
+	"cheerio": "0.9.x"
   },
   "devDependencies": {},
-  "engine": "node >= 0.6.19"
+  "engine": "node >= 0.8.x"
 }
