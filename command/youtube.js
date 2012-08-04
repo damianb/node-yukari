@@ -1,7 +1,7 @@
-var _s = require('underscore.string')
-var https = require('https')
-var irc = require('irc')
-var url = require('url')
+var util = require('util'),
+	https = require('https'),
+	url = require('url'),
+	irc = require('irc')
 
 function command() {
 	this.name = 'youtube'
@@ -97,8 +97,7 @@ command.prototype.grabYoutube = function(videoid, callback) {
 					})
 					.on('end', function() {
 						var data = JSON.parse(api_body)
-						var format = '[YouTube] <http://youtu.be/%s> "%s" [%d:%d] - %d views'
-						callback(_s.sprintf(format,
+						callback(util.format('[YouTube] <http://youtu.be/%s> "%s" [%d:%d] - %d views',
 							data['entry']['media$group']['yt$videoid']['$t'],
 							data['entry']['title']['$t'],
 							Math.round(data['entry']['media$group']['yt$duration']['seconds'] / 60),
