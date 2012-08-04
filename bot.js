@@ -12,7 +12,6 @@ var yukari = require('./yukari'),
 	https = require('https'),
 
 	// npm packages
-	_s = require('underscore.string'),
 	conf = require('nconf'),
 	url = require('url'),
 	irc = require('irc'),
