@@ -31,13 +31,14 @@ command.prototype.procTo = function(callback, victim, recipient) {
 	}
 
 	args = Array.prototype.slice.call(arguments, 2)
+	target = args.shift()
 	command = args.shift()
 	if(c.yukari.listeners('command.' + command).length == 0) {
 		callback(victim + ': invalid command')
 		return
 	}
 
-	c.yukari.emit.apply(c.yukari, ['command.' + command, callback, victim, recipient].concat(args))
+	c.yukari.emit.apply(c.yukari, ['command.' + command, callback, target].concat(args))
 }
 
 var c = module.exports = new command()
