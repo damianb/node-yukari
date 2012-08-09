@@ -1,5 +1,3 @@
-var conf = require('nconf')
-
 function command() {
 	this.name = 'core'
 	this.locked = true // enable/disable commands will refuse to mess with this plugin
@@ -25,6 +23,11 @@ function command() {
 			command:	'source',
 			help:		'provides a link to the source code for the bot',
 			longhelp:	''
+		},
+		{
+			command:	'owner',
+			help:		'states the recorded owner of the bot',
+			longhelp:	''
 		}
 	]
 }
@@ -37,6 +40,7 @@ command.prototype.init = function(yukari) {
 command.prototype.load = function() {
 	this.yukari.on('command.die', this.procDie)
 	this.yukari.on('command.source', this.procSource)
+	this.yukari.on('command.owner', this.procOwner)
 	this.yukari.on('command.version', this.procVersion)
 	this.yukari.on('ctcp.version', this.procCVersion)
 	this.enabled = true
@@ -45,6 +49,7 @@ command.prototype.load = function() {
 command.prototype.unload = function() {
 	this.yukari.removeListener('command.die', this.procDie)
 	this.yukari.removeListener('command.source', this.procSource)
+	this.yukari.removeListener('command.owner', this.procOwner)
 	this.yukari.removeListener('command.version', this.procVersion)
 	this.yukari.removeListener('ctcp.version', this.processCVersion)
 	this.enabled = false
@@ -60,6 +65,10 @@ command.prototype.procDie = function(callback, victim) {
 
 command.prototype.procSource = function(callback, victim) {
 	callback(victim + ': My source is available at <https://github.com/damianb/node-yukari>')
+}
+
+command.prototype.procSource = function(callback, victim) {
+	callback(victim + ': My owner is ' + c.yukari.conf.get('bot:owner'))
 }
 
 command.prototype.procVersion = function(callback, victim) {
