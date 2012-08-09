@@ -67,7 +67,7 @@ command.prototype.procSource = function(callback, victim) {
 	callback(victim + ': My source is available at <https://github.com/damianb/node-yukari>')
 }
 
-command.prototype.procSource = function(callback, victim) {
+command.prototype.procOwner = function(callback, victim) {
 	callback(victim + ': My owner is ' + c.yukari.conf.get('bot:owner'))
 }
 
