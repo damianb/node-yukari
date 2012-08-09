@@ -61,7 +61,7 @@ var client = new irc.Client(conf.get('irc:address'), conf.get('bot:nick'), {
 })
 
 
-var nickcheck = new RegExp('^' + conf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + '\W+\s*(.*)', 'i'),
+var nickcheck = new RegExp('^' + conf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + '\\W+\\s*(.*)', 'i'),
 	bot = yukari.construct(client, conf.get('bot:commands')),
 	libs = {
 		http: http,
