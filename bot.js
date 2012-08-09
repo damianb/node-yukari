@@ -60,7 +60,9 @@ var client = new irc.Client(conf.get('irc:address'), conf.get('bot:nick'), {
 	stripColors: true
 })
 
-var bot = yukari.construct(client, conf.get('bot:commands')),
+
+var nickcheck = new RegExp('^' + conf.get('bot:name').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + '\W+\s*(.*)', 'i'),
+	bot = yukari.construct(client, conf.get('bot:commands')),
 	libs = {
 		http: http,
 		https: https,
@@ -135,8 +137,9 @@ client.addListener('message' + conf.get('bot:primarychannel'), function (nick, t
 		}
 	} else {
 		// check for "addressed" commands
-		var split = text.match(new RegExp('^' + conf.get('bot:nick') + '\b+(.*)', 'i'))
+		var split = nickcheck.exec(text)
 		console.log(split)
+		console.log(nickcheck)
 	}
 })
 
