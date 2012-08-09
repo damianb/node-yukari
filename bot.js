@@ -164,7 +164,7 @@ client.addListener('message' + conf.get('bot:primarychannel'), function (nick, t
  * non-command eavesdropping...
  */
 client.addListener('message' + conf.get('bot:primarychannel'), function (nick, text) {
-	if(bot.talk == true && text.charAt(0) != conf.get('bot:command')) {
+	if(bot.talk == true && text.charAt(0) != conf.get('bot:command') && nickcheck.exec(text) == null) {
 		var cb = function(response){
 				if(response == false) {
 					client.action(conf.get('bot:primarychannel'), 'hiccups')
