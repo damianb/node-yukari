@@ -62,6 +62,13 @@ var client = new irc.Client(conf.get('irc:address'), conf.get('bot:nick'), {
 
 
 var nickcheck = new RegExp('^' + conf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + '\\W+\\s*(.*)', 'i'),
+	responsecb = function(response){
+		if(response == false) {
+			client.action(conf.get('bot:primarychannel'), 'hiccups')
+		} else {
+			client.say(conf.get('bot:primarychannel'), response)
+		}
+	},
 	bot = yukari.construct(client, conf.get('bot:commands')),
 	libs = {
 		http: http,
@@ -121,19 +128,12 @@ client.addListener('ctcp', function (from, to, text, type) {
 client.addListener('message' + conf.get('bot:primarychannel'), function (nick, text, message) {
 	if(bot.talk == true && text.charAt(0) == conf.get('bot:command')) {
 		var split = text.slice(1).split(' '),
-			command = split.shift(),
-			cb = function(response){
-					if(response == false) {
-						client.action(conf.get('bot:primarychannel'), 'hiccups')
-					} else {
-						client.say(conf.get('bot:primarychannel'), response)
-					}
-				}
+			command = split.shift()
 		if(bot.listeners('command.' + command).length == 0) {
 			// invalid command!
-			bot.emit.apply(bot, ['null.command', cb, nick, command].concat(split))
+			bot.emit.apply(bot, ['null.command', responsecb, nick, command].concat(split))
 		} else {
-			bot.emit.apply(bot, ['command.' + command, cb, nick].concat(split))
+			bot.emit.apply(bot, ['command.' + command, responsecb, nick].concat(split))
 		}
 	} else {
 		// check for "addressed" commands
@@ -141,20 +141,13 @@ client.addListener('message' + conf.get('bot:primarychannel'), function (nick, t
 		if(addr != null) {
 			addr.shift() // junk
 			var split = addr.shift().split(' '),
-				command = split.shift(),
-				cb = function(response){
-						if(response == false) {
-							client.action(conf.get('bot:primarychannel'), 'hiccups')
-						} else {
-							client.say(conf.get('bot:primarychannel'), response)
-						}
-					}
+				command = split.shift()
 			// @todo special emit perhaps, because this was addressed?
 			if(bot.listeners('command.' + command).length == 0) {
 				// invalid command!
-				bot.emit.apply(bot, ['null.command', cb, nick, command].concat(split))
+				bot.emit.apply(bot, ['null.command', responsecb, nick, command].concat(split))
 			} else {
-				bot.emit.apply(bot, ['command.' + command, cb, nick].concat(split))
+				bot.emit.apply(bot, ['command.' + command, responsecb, nick].concat(split))
 			}
 		}
 	}
@@ -165,15 +158,7 @@ client.addListener('message' + conf.get('bot:primarychannel'), function (nick, t
  */
 client.addListener('message' + conf.get('bot:primarychannel'), function (nick, text) {
 	if(bot.talk == true && text.charAt(0) != conf.get('bot:command') && nickcheck.exec(text) == null) {
-		var cb = function(response){
-				if(response == false) {
-					client.action(conf.get('bot:primarychannel'), 'hiccups')
-				} else {
-					client.say(conf.get('bot:primarychannel'), response)
-				}
-			}
-
-		bot.emit('sniff', cb, nick, text)
+		bot.emit('sniff', responsecb, nick, text)
 	}
 })
 
