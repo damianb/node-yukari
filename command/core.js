@@ -68,7 +68,7 @@ command.prototype.procSource = function(callback, victim) {
 }
 
 command.prototype.procOwner = function(callback, victim) {
-	callback(victim + ': My owner is ' + c.yukari.conf.get('bot:owner'))
+	callback(victim + ': My owner is ' + c.yukari.libs['conf'].get('bot:owner'))
 }
 
 command.prototype.procVersion = function(callback, victim) {
