@@ -137,9 +137,26 @@ client.addListener('message' + conf.get('bot:primarychannel'), function (nick, t
 		}
 	} else {
 		// check for "addressed" commands
-		var split = nickcheck.exec(text)
-		console.log(split)
-		console.log(nickcheck)
+		var addr = nickcheck.exec(text)
+		if(addr != null) {
+			addr.shift() // junk
+			var split = addr.shift().split(' '),
+				command = split.shift(),
+				cb = function(response){
+						if(response == false) {
+							client.action(conf.get('bot:primarychannel'), 'hiccups')
+						} else {
+							client.say(conf.get('bot:primarychannel'), response)
+						}
+					}
+			// @todo special emit perhaps, because this was addressed?
+			if(bot.listeners('command.' + command).length == 0) {
+				// invalid command!
+				bot.emit.apply(bot, ['null.command', cb, nick, command].concat(split))
+			} else {
+				bot.emit.apply(bot, ['command.' + command, cb, nick].concat(split))
+			}
+		}
 	}
 })
 
