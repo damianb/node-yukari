@@ -7,6 +7,7 @@
  */
 var yukari = require('./yukari'),
 
+// magic load stuff, will be stuffed into yukari
 	// node builtins
 	http = require('http'),
 	https = require('https'),
@@ -15,8 +16,7 @@ var yukari = require('./yukari'),
 	conf = require('nconf'),
 	url = require('url'),
 	irc = require('irc'),
-	//db = require('orm'),
-	colors = irc.colors
+	cheerio = require('cheerio')
 
 EventEmitter = require('events').EventEmitter
 
@@ -33,7 +33,7 @@ conf.defaults({
 		'owner'			:'unknown',
 		'command'		:'!',
 		'nickserv_pass'	:'',
-		'primarychannel':'#yukari',
+		'primarychannel':'#yukari', // 0.2 will change to handle multiple channels
 		'commands'		:[
 			'core',
 			'random',
@@ -60,7 +60,16 @@ var client = new irc.Client(conf.get('irc:address'), conf.get('bot:nick'), {
 	stripColors: true
 })
 
-var bot = yukari.construct(client, conf.get('bot:commands'))
+var bot = yukari.construct(client, conf.get('bot:commands')),
+	libs = {
+		http: http,
+		https: https,
+		conf: conf,
+		url: url,
+		irc: irc,
+		colors: irc.colors
+	}
+for(var attrname in libs) bot.libs[attrname] = libs[attrname]
 
 /**
  * display notices, messages, and pm's
@@ -86,14 +95,12 @@ client.addListener('motd', function (motd) {
 	console.log('-!- identifying to nickserv...')
 	if(conf.get('bot:nickserv_pass')) {
 		client.say('NickServ', 'identify ' + conf.get('bot:nickserv_pass'))
-
-		// for sec reasons, nuke this from memory
-		conf.set('bot:nickserv_pass', '')
 	}
 })
 
 /**
  * handle ctcp responses
+ * - does not obey bot.talk for functionality purposes.
  */
 client.addListener('ctcp', function (from, to, text, type) {
 	console.log('CTCP ' + type + ': ' + from + '=>' + to + ' (' + text + ')')
@@ -110,22 +117,26 @@ client.addListener('ctcp', function (from, to, text, type) {
  * handle commands in our primary channel
  */
 client.addListener('message' + conf.get('bot:primarychannel'), function (nick, text, message) {
-	if(text.charAt(0) == conf.get('bot:command')) {
+	if(bot.talk == true && text.charAt(0) == conf.get('bot:command')) {
 		var split = text.slice(1).split(' '),
 			command = split.shift(),
-			cb = function(message){
-					if(message == false) {
+			cb = function(response){
+					if(response == false) {
 						client.action(conf.get('bot:primarychannel'), 'hiccups')
 					} else {
-						client.say(conf.get('bot:primarychannel'), message)
+						client.say(conf.get('bot:primarychannel'), response)
 					}
 				}
 		if(bot.listeners('command.' + command).length == 0) {
 			// invalid command!
-			bot.emit.apply(bot, ['command..null', cb, nick, command].concat(split))
+			bot.emit.apply(bot, ['null.command', cb, nick, command].concat(split))
 		} else {
 			bot.emit.apply(bot, ['command.' + command, cb, nick].concat(split))
 		}
+	} else {
+		// check for "addressed" commands
+		var split = text.match(new RegExp('^' + conf.get('bot:nick') + '\b+(.*)', 'i'))
+		console.log(split)
 	}
 })
 
@@ -133,12 +144,12 @@ client.addListener('message' + conf.get('bot:primarychannel'), function (nick, t
  * non-command eavesdropping...
  */
 client.addListener('message' + conf.get('bot:primarychannel'), function (nick, text) {
-	if(text.charAt(0) != conf.get('bot:command')) {
-		var cb = function(message){
-				if(message == false) {
+	if(bot.talk == true && text.charAt(0) != conf.get('bot:command')) {
+		var cb = function(response){
+				if(response == false) {
 					client.action(conf.get('bot:primarychannel'), 'hiccups')
 				} else {
-					client.say(conf.get('bot:primarychannel'), message)
+					client.say(conf.get('bot:primarychannel'), response)
 				}
 			}
 

@@ -4,9 +4,14 @@ var util = require('util'),
 util.inherits(yukari, EventEmitter)
 
 function yukari(client, cmds) {
-	this.version = '0.1.0'
+	this.version = '0.1.1'
 	this.client = client
 	this.commands = {}
+	this.libs = {
+		util:		util,
+		client: 	client,
+	}
+	this.talk = true
 
 	var yukari = this
 	cmds.forEach(function(val, key, ar) {
