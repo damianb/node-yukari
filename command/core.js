@@ -55,24 +55,24 @@ command.prototype.unload = function() {
 	this.enabled = false
 }
 
-command.prototype.procDie = function(callback, victim) {
+command.prototype.procDie = function(callback, origin, victim) {
 	// @todo authorization check
 
-	callback('Bai!')
+	callback(origin, 'Bai!')
 	console.log('-!- TERMINATING')
 	c.yukari.client.disconnect('Yukari.js IRC bot - version ' + c.yukari.version)
 }
 
-command.prototype.procSource = function(callback, victim) {
-	callback(victim + ': My source is available at <https://github.com/damianb/node-yukari>')
+command.prototype.procSource = function(callback, origin, victim) {
+	callback(origin, victim + ': My source is available at <https://github.com/damianb/node-yukari>')
 }
 
-command.prototype.procOwner = function(callback, victim) {
-	callback(victim + ': My owner is ' + c.yukari.libs['conf'].get('bot:owner'))
+command.prototype.procOwner = function(callback, origin, victim) {
+	callback(origin, victim + ': My owner is ' + c.yukari.libs['conf'].get('bot:owner'))
 }
 
-command.prototype.procVersion = function(callback, victim) {
-	callback(victim + ': I am running Yukari.js IRC bot, version ' + c.yukari.version)
+command.prototype.procVersion = function(callback, origin, victim) {
+	callback(origin, victim + ': I am running Yukari.js IRC bot, version ' + c.yukari.version)
 }
 
 command.prototype.procCVersion = function(callback, victim, target, ctcp, type) {

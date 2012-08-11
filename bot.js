@@ -33,7 +33,9 @@ conf.defaults({
 		'owner'			:'unknown',
 		'command'		:'!',
 		'nickserv_pass'	:'',
-		'primarychannel':'#yukari', // 0.2 will change to handle multiple channels
+		'channels':		[
+			'#yukari'
+		],
 		'commands'		:[
 			'core',
 			'random',
@@ -53,7 +55,7 @@ conf.defaults({
 var client = new irc.Client(conf.get('irc:address'), conf.get('bot:nick'), {
 	userName: conf.get('bot:username'),
 	realName: conf.get('bot:realname') + ' (owner: ' + conf.get('bot:owner') + ')',
-	channels: [conf.get('bot:primarychannel')],
+	channels: conf.get('bot:channels'),
 	port: conf.get('irc:port'),
 	secure: conf.get('irc:secure'),
 	autoConnect: false,
@@ -62,11 +64,11 @@ var client = new irc.Client(conf.get('irc:address'), conf.get('bot:nick'), {
 
 
 var nickcheck = new RegExp('^' + conf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + '\\W+\\s*(.*)', 'i'),
-	responsecb = function(response){
+	responsecb = function(origin, response){
 		if(response == false) {
-			client.action(conf.get('bot:primarychannel'), 'hiccups')
+			client.action(origin, 'hiccups')
 		} else {
-			client.say(conf.get('bot:primarychannel'), response)
+			client.say(origin, response)
 		}
 	},
 	bot = yukari.construct(client, conf.get('bot:commands')),
@@ -76,7 +78,8 @@ var nickcheck = new RegExp('^' + conf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\)
 		conf: conf,
 		url: url,
 		irc: irc,
-		colors: irc.colors
+		colors: irc.colors,
+		cheerio: cheerio
 	}
 for(var attrname in libs) bot.libs[attrname] = libs[attrname]
 
@@ -125,29 +128,28 @@ client.addListener('ctcp', function (from, to, text, type) {
 /**
  * handle commands in our primary channel
  */
-client.addListener('message' + conf.get('bot:primarychannel'), function (nick, text, message) {
+client.addListener('message#', function (nick, to, text) {
 	if(bot.talk == true && text.charAt(0) == conf.get('bot:command')) {
 		var split = text.slice(1).split(' '),
 			command = split.shift()
 		if(bot.listeners('command.' + command).length == 0) {
 			// invalid command!
-			bot.emit.apply(bot, ['null.command', responsecb, nick, command].concat(split))
+			bot.emit.apply(bot, ['null.command', responsecb, to, nick, command].concat(split))
 		} else {
-			bot.emit.apply(bot, ['command.' + command, responsecb, nick].concat(split))
+			bot.emit.apply(bot, ['command.' + command, responsecb, to, nick].concat(split))
 		}
 	} else {
 		// check for "addressed" commands
 		var addr = nickcheck.exec(text)
 		if(addr != null) {
-			addr.shift() // junk
-			var split = addr.shift().split(' '),
+			var split = addr.slice(1).shift().split(' '),
 				command = split.shift()
 			// @todo special emit perhaps, because this was addressed?
 			if(bot.listeners('command.' + command).length == 0) {
 				// invalid command!
-				bot.emit.apply(bot, ['null.command', responsecb, nick, command].concat(split))
+				bot.emit.apply(bot, ['null.command', responsecb, to, nick, command].concat(split))
 			} else {
-				bot.emit.apply(bot, ['command.' + command, responsecb, nick].concat(split))
+				bot.emit.apply(bot, ['command.' + command, responsecb, to, nick].concat(split))
 			}
 		}
 	}
@@ -156,9 +158,9 @@ client.addListener('message' + conf.get('bot:primarychannel'), function (nick, t
 /**
  * non-command eavesdropping...
  */
-client.addListener('message' + conf.get('bot:primarychannel'), function (nick, text) {
+client.addListener('message#', function (nick, to, text) {
 	if(bot.talk == true && text.charAt(0) != conf.get('bot:command') && nickcheck.exec(text) == null) {
-		bot.emit('sniff', responsecb, nick, text)
+		bot.emit('sniff', responsecb, to, nick, text)
 	}
 })
 

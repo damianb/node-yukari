@@ -25,7 +25,7 @@ command.prototype.unload = function() {
 	this.enabled = false
 }
 
-command.prototype.procTo = function(callback, victim, recipient) {
+command.prototype.procTo = function(callback, origin, victim, recipient) {
 	if(arguments.length < 4) {
 		return
 	}
@@ -34,7 +34,7 @@ command.prototype.procTo = function(callback, victim, recipient) {
 	target = args.shift()
 	command = args.shift()
 	if(c.yukari.listeners('command.' + command).length == 0) {
-		callback(victim + ': invalid command')
+		callback(origin, victim + ': invalid command')
 		return
 	}
 

@@ -31,24 +31,12 @@ command.prototype.unload = function() {
 	this.enabled = false
 }
 
-command.prototype.valRandom = function(victim) {
-	return true
+command.prototype.procRandom = function(callback, origin, victim) {
+	callback(origin, victim + ': 4')
 }
 
-command.prototype.procRandom = function(callback, victim) {
-	if(!c.valRandom(victim)) return
-
-	callback(victim + ': 4')
-}
-
-command.prototype.valCoin = function(victim) {
-	return true
-}
-
-command.prototype.procCoin = function(callback, victim) {
-	if(!c.valCoin(victim)) return
-
-	callback(victim + ': ' + (Math.round(Math.random()) ? 'heads' : 'tails'))
+command.prototype.procCoin = function(callback, origin, victim) {
+	callback(origin, victim + ': ' + (Math.round(Math.random()) ? 'heads' : 'tails'))
 }
 
 var c = module.exports = new command()

@@ -46,7 +46,7 @@ command.prototype.extractVidID = function(uri) {
 	return videoid
 }
 
-command.prototype.procYoutube = function(callback, victim, video) {
+command.prototype.procYoutube = function(callback, origin, victim, video) {
 	if(arguments.length < 2) return
 
 	var videoid = c.extractVidID(video)
@@ -54,14 +54,14 @@ command.prototype.procYoutube = function(callback, victim, video) {
 
 	c.grabYoutube(videoid, function(ret) {
 		if(ret !== false) {
-			callback(victim + ': ' + ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
+			callback(origin, victim + ': ' + ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 		} else {
-			callback(false)
+			callback(origin, false)
 		}
 	})
 }
 
-command.prototype.procSniff = function(callback, victim, text) {
+command.prototype.procSniff = function(callback, origin, victim, text) {
 	youtube = text.match(/http:\/\/(?:(?:www\.)?youtube\.com|youtu\.be)(?:\/watch\?v=|\/)([\w\-\_]+)/ig)
 	if(youtube == null) return
 
@@ -71,9 +71,9 @@ command.prototype.procSniff = function(callback, victim, text) {
 		if(videoid != false) {
 			c.grabYoutube(videoid, function(ret) {
 				if(ret !== false) {
-					callback(ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
+					callback(origin, ret.replace('[YouTube]', '[' + irc.colors.wrap('light_red', 'You') + irc.colors.wrap('white', 'Tube') + ']'))
 				} else {
-					callback(false)
+					callback(origin, false)
 				}
 			})
 		}

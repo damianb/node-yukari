@@ -4,7 +4,7 @@ var util = require('util'),
 util.inherits(yukari, EventEmitter)
 
 function yukari(client, cmds) {
-	this.version = '0.1.1'
+	this.version = '0.2.0'
 	this.client = client
 	this.commands = {}
 	this.libs = {
