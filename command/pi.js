@@ -30,7 +30,7 @@ command.prototype.unload = function() {
 
 command.prototype.procPi = function(callback, origin, victim) {
 	// need to throttle
-	if((new Date().getTime() - c.throttle.getTime()) < 1000) {
+	if(c.throttle != null && (new Date().getTime() - c.throttle.getTime()) < 1000) {
 		callback(victim + ': NOPE! Throttled.') // bleh
 		return
 	}
