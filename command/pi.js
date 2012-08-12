@@ -40,7 +40,7 @@ command.prototype.procPi = function(callback, origin, victim) {
 		path: '/cgi-bin/random-pi-point.py',
 	};
 	try {
-		https
+		http
 			.get(options, function(res) {
 				var api_body = ''
 				res.setEncoding('utf8')
