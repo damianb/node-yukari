@@ -65,10 +65,13 @@ var client = new irc.Client(conf.get('irc:address'), conf.get('bot:nick'), {
 
 var nickcheck = new RegExp('^' + conf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + '\\W+\\s*(.*)', 'i'),
 	responsecb = function(origin, response){
-		if(response == false) {
-			client.action(origin, 'hiccups')
-		} else {
-			client.say(origin, response)
+		// check for mute
+		if(bot.talk != false || origin.search(/^[&#\+\!]/i) == -1) {
+			if(response == false) {
+				client.action(origin, 'hiccups')
+			} else {
+				client.say(origin, response)
+			}
 		}
 	},
 	bot = yukari.construct(client, conf.get('bot:commands')),
@@ -114,24 +117,32 @@ client.addListener('motd', function (motd) {
  * handle ctcp responses
  * - does not obey bot.talk for functionality purposes.
  */
-client.addListener('ctcp', function (from, to, text, type) {
-	console.log('CTCP ' + type + ': ' + from + '=>' + to + ' (' + text + ')')
+client.addListener('ctcp', function (from, to, type, text) {
+	console.log('CTCP ' + type + ': ' + from + '=>' + to + ' (' + type + ')')
 
-	text = text.toLowerCase()
+	ctcp = type.toLowerCase()
 	var cb = function(reply){
-			if(reply != false) client.ctcp(from, text.toUpperCase(), reply)
-		}
+			if(reply != false) client.ctcp(from, ctcp.toUpperCase(), reply)
+		},
+		split = text.split(' ')
 
-	bot.emit('ctcp.' + text, cb, from, to, text, type)
+	if(ctcp == 'privmsg' && split.shift() == 'action') {
+		//console.log('CTCP ' + type + ': ' + from + '=>' + to + ' (' + type + ')')
+		bot.emit('action', responsecb, to, from, split)
+	} else {
+		//console.log('CTCP ' + type + ': ' + from + '=>' + to + ' (' + type + ')')
+		bot.emit('ctcp.' + ctcp, cb, from, to, ctcp, text)
+	}
 })
 
 /**
  * handle commands in our primary channel
  */
 client.addListener('message#', function (nick, to, text) {
-	if(bot.talk == true && text.charAt(0) == conf.get('bot:command')) {
-		var split = text.slice(1).split(' '),
-			command = split.shift()
+	var addr, split, command
+	if(text.charAt(0) == conf.get('bot:command')) {
+		split = text.slice(1).split(' ')
+		command = split.shift()
 		if(bot.listeners('command.' + command).length == 0) {
 			// invalid command!
 			bot.emit.apply(bot, ['null.command', responsecb, to, nick, command].concat(split))
@@ -140,10 +151,9 @@ client.addListener('message#', function (nick, to, text) {
 		}
 	} else {
 		// check for "addressed" commands
-		var addr = nickcheck.exec(text)
-		if(addr != null) {
-			var split = addr.slice(1).shift().split(' '),
-				command = split.shift()
+		if((addr = nickcheck.exec(text)) != null) {
+			split = addr.slice(1).shift().split(' ')
+			command = split.shift()
 			// @todo special emit perhaps, because this was addressed?
 			if(bot.listeners('command.' + command).length == 0) {
 				// invalid command!
@@ -159,7 +169,7 @@ client.addListener('message#', function (nick, to, text) {
  * non-command eavesdropping...
  */
 client.addListener('message#', function (nick, to, text) {
-	if(bot.talk == true && text.charAt(0) != conf.get('bot:command') && nickcheck.exec(text) == null) {
+	if(text.charAt(0) != conf.get('bot:command') && nickcheck.exec(text) == null) {
 		bot.emit('sniff', responsecb, to, nick, text)
 	}
 })
