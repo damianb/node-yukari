@@ -47,7 +47,7 @@ command.prototype.extractVidID = function(uri) {
 }
 
 command.prototype.procYoutube = function(callback, origin, victim, video) {
-	if(arguments.length < 2) return
+	if(arguments.length < 4) return
 
 	var videoid = c.extractVidID(video)
 	if(!videoid) return
