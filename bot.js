@@ -13,7 +13,7 @@ var yukari = require('./yukari'),
 	https = require('https'),
 
 	// npm packages
-	conf = require('nconf'),
+	nconf = require('nconf'),
 	url = require('url'),
 	irc = require('irc'),
 	cheerio = require('cheerio')
@@ -23,9 +23,9 @@ EventEmitter = require('events').EventEmitter
 /**
  * configuration
  */
-conf.argv().env()
-conf.file({file: 'config.json'})
-conf.defaults({
+nconf.argv().env()
+nconf.file({file: 'config.json'})
+nconf.defaults({
 	'bot':{
 		'nick'			:'Yukari-chan',
 		'username'		:'Yukari',
@@ -52,18 +52,18 @@ conf.defaults({
 /**
  * Prep for connection
  */
-var client = new irc.Client(conf.get('irc:address'), conf.get('bot:nick'), {
-	userName: conf.get('bot:username'),
-	realName: conf.get('bot:realname') + ' (owner: ' + conf.get('bot:owner') + ')',
-	channels: conf.get('bot:channels'),
-	port: conf.get('irc:port'),
-	secure: conf.get('irc:secure'),
+var client = new irc.Client(nconf.get('irc:address'), nconf.get('bot:nick'), {
+	userName: nconf.get('bot:username'),
+	realName: nconf.get('bot:realname') + ' (owner: ' + nconf.get('bot:owner') + ')',
+	channels: nconf.get('bot:channels'),
+	port: nconf.get('irc:port'),
+	secure: nconf.get('irc:secure'),
 	autoConnect: false,
 	stripColors: true
 })
 
 
-var nickcheck = new RegExp('^' + conf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + '\\W+\\s*(.*)', 'i'),
+var nickcheck = new RegExp('^' + nconf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + '\\W+\\s*(.*)', 'i'),
 	responsecb = function(origin, response){
 		// check for mute
 		if(bot.talk != false || origin.search(/^[&#\+\!]/i) == -1) {
@@ -74,7 +74,7 @@ var nickcheck = new RegExp('^' + conf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\)
 			}
 		}
 	},
-	bot = yukari.construct(client, conf.get('bot:commands')),
+	bot = yukari.construct(client, nconf.get('bot:commands')),
 	libs = {
 		http: http,
 		https: https,
@@ -85,6 +85,11 @@ var nickcheck = new RegExp('^' + conf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\)
 		cheerio: cheerio
 	}
 for(var attrname in libs) bot.libs[attrname] = libs[attrname]
+
+
+
+
+
 
 /**
  * display notices, messages, and pm's
@@ -108,7 +113,7 @@ client.addListener('notice', function (from, to, text) {
  */
 client.addListener('motd', function (motd) {
 	console.log('-!- identifying to nickserv...')
-	if(conf.get('bot:nickserv_pass')) {
+	if(nconf.get('bot:nickserv_pass')) {
 		client.say('NickServ', 'identify ' + conf.get('bot:nickserv_pass'))
 	}
 })
@@ -140,7 +145,7 @@ client.addListener('ctcp', function (from, to, type, text) {
  */
 client.addListener('message#', function (nick, to, text) {
 	var addr, split, command
-	if(text.charAt(0) == conf.get('bot:command')) {
+	if(text.charAt(0) == nconf.get('bot:command')) {
 		split = text.slice(1).split(' ')
 		command = split.shift()
 		if(bot.listeners('command.' + command).length == 0) {
@@ -161,18 +166,21 @@ client.addListener('message#', function (nick, to, text) {
 			} else {
 				bot.emit.apply(bot, ['command.' + command, responsecb, to, nick].concat(split))
 			}
+		} else {
+			bot.emit('sniff', responsecb, to, nick, text)
 		}
 	}
 })
 
 /**
  * non-command eavesdropping...
- */
+ *
 client.addListener('message#', function (nick, to, text) {
-	if(text.charAt(0) != conf.get('bot:command') && nickcheck.exec(text) == null) {
+	if(text.charAt(0) != nconf.get('bot:command') && nickcheck.exec(text) == null) {
 		bot.emit('sniff', responsecb, to, nick, text)
 	}
 })
+ */
 
 /**
  * runtime
