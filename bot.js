@@ -228,14 +228,17 @@ client
 		if(arguments.length < 4)
 			return
 
-		args = Array.prototype.slice.call(arguments, 2)
-		(target = args.shift()) && (command = args.shift())
+		args = Array.prototype.slice.call(arguments, 3)
+		console.dir(args)
+		target = arguments[3]
+		command = arguments[4]
+		console.log(target)
 		if(client.listeners('yukari.command.' + command).length == 0) {
-			callback(origin, victim + ': invalid command')
+			callback(origin, victim + ': invalid command "' + command + '"')
 			return
 		}
 
-		client.emit.apply(client, ['yukari.command.' + command, callback, target].concat(args))
+		client.emit.apply(client, ['yukari.command.' + command, callback, origin].concat(args))
 	})
 	.alias('pi', function(callback, origin, victim) {
 		// need to throttle
@@ -263,6 +266,12 @@ client
 			console.log('error: pi fetch error: ' + err)
 			callback(false)
 		}
+	})
+	.alias('status', function(callback, origin, victim) {
+		callback(origin, victim + ': Still connected and running, haven\'t crashed y')
+	})
+	.alias('rimshot', function(callback, origin, victim) {
+		callback(origin, victim + ': http://instantrimshot.com/classic/?sound=rimshot')
 	})
 	.alias(['random', 'rnd'], function(callback, origin, victim) {
 		callback(origin, victim + ': 4')
@@ -321,6 +330,7 @@ client
 			}
 		})
 	})
+/*
 client.addListener('yukari.sniff', function(callback, origin, victim, text) {
 	process.nextTick(function() {
 		youtube = text.match(/http:\/\/(?:(?:www\.)?youtube\.com|youtu\.be)(?:\/watch\?v=|\/)([\w\-\_]+)/ig)
@@ -341,6 +351,7 @@ client.addListener('yukari.sniff', function(callback, origin, victim, text) {
 		})
 	})
 })
+*/
 
 
 
