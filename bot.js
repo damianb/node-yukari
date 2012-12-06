@@ -279,6 +279,31 @@ client
 	.alias(['coin', 'flip'], function(callback, origin, victim) {
 		callback(origin, victim + ': ' + (Math.round(Math.random()) ? 'heads' : 'tails'))
 	})
+	.alias('help', function(callback, origin, victim) {
+		var response = victim + ': '
+		switch(victim.toLowerCase()) {
+			case 'rnowak':
+				response += '______\o/______/|_'
+			break
+			case 'peng':
+				response += 'there\'s not enough help in the world for you, pal'
+			break
+			case 'tjfontaine':
+				response += 'go read the source code, lazy'
+			break
+			case 'mwalling':
+				response += 'my help is available at http://ghz.me/t.htm'
+			break
+			case 'staticsafe':
+				response += 'http://www.youtube.com/watch?v=gvdf5n-zI14'
+			case 'avenj':
+				response += '<obscure regular expression containing help information here>'
+			break
+			default:
+				response += 'please insert $0.50 to continue'
+		}
+		callback(origin, response)
+	})
 
 /**
  * Youtube!
