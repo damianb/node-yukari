@@ -8,6 +8,7 @@
 	// node builtins
 var http = require('http'),
 	https = require('https'),
+	fs = require('fs'),
 
 	// npm packages
 	nconf = require('nconf'),
@@ -15,7 +16,13 @@ var http = require('http'),
 	irc = require('irc'),
 	util = require('util'),
 	cheerio = require('cheerio'),
+	sqlite = require('sqlite3'),
+	async = require('async'),
+	db = new sqlite.Database('yukari.db', function(err) {
+		if(err) throw new Error(err)
+	})
 
+// @todo see if this is still needed
 EventEmitter = require('events').EventEmitter
 
 var yukari = {
@@ -33,6 +40,7 @@ var yukari = {
 /**
  * configuration
  */
+console.log('-!- loading configuration')
 nconf.argv().env()
 nconf.file({file: 'config.json'})
 nconf.defaults({
@@ -54,6 +62,20 @@ nconf.defaults({
 		'secure'		:false
 	}
 })
+
+console.log('-!- preparing database')
+fs.readFileSync('./yukari.sql')
+db.serialize(function() {
+	var dbOut = function(line) {
+		db.exec(line, function(err) { if(err) { console.log('ee: ' + err) } /*console.log('  : ' + line)*/ })
+	}
+	fs.readFileSync('./yukari.sql').toString().split(';\n').forEach(function(line){
+		if(!line.match(/^\s*$/)) {
+			dbOut(line)
+		}
+	})
+})
+
 
 /**
  * Prep for connection
@@ -203,6 +225,9 @@ client.alias = function(alias, listener) {
 	}
 	return this
 }
+client.addListener('yukari.null-command', function(callback, origin, victim, command) {
+	console.log('unknown command "%s"', command)
+})
 
 /**
  * custom commands (not in own file because i'm just that fucking lazy)
@@ -227,7 +252,7 @@ client
 	})
 	.alias('uptime', function(callback, origin, victim) {
 		//Convert duration from milliseconds to 0000:00:00.00 format
-		callback(origin, "Yukari uptime: " + getTimespan((new Date().getTime()) - (yukari.start.getTime())))
+		callback(origin, "Yukari.js uptime: " + getTimespan((new Date().getTime()) - (yukari.start.getTime())))
 	})
 	.alias('to', function(callback, origin, victim, recipient) {
 		if(arguments.length < 4)
@@ -397,15 +422,8 @@ client.addListener('yukari.sniff', function(callback, origin, victim, text) {
 })
 
 
-
-
-
-
-
-
-
 /**
  * runtime
  */
 client.connect()
-console.log('Starting up Yukari...')
+console.log('-!- Starting up Yukari...')
