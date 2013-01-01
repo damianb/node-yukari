@@ -22,7 +22,7 @@ create table if not exists catgirls (
 	channel not null,
 	hostmask not null,
 	time integer not null,
-	url not null,
+	url not null
 );
 
 create table if not exists users (

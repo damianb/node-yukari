@@ -34,7 +34,7 @@ var yukari = {
 			rounds: 'dummy',
 		}
 	},
-	version: '0.4.0',
+	version: '0.5.0',
 	talk: true,
 	start: new Date(),
 }
