@@ -2,3 +2,4 @@ config.js
 *.komodoproject
 node_modules
 config.json
+yukari.db
