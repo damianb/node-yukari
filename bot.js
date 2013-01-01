@@ -9,6 +9,7 @@
 var http = require('http'),
 	https = require('https'),
 	fs = require('fs'),
+	crypto = require('crypto')
 
 	// npm packages
 	nconf = require('nconf'),
@@ -233,8 +234,11 @@ client.addListener('yukari.null-command', function(callback, origin, victim, com
  * message logging
  */
 client.addListener('message#', function(nick, origin, text, msgobj) {
-	var host = msgobj.nick + '!' + msgobj.user + '@' + msgobj.host
-	db.run('INSERT INTO log VALUES (null, ?, ?, ?, ?, ?)', [nick, origin, host, new Date().getTime(), text])
+	if(nick === undefined) return
+
+	var host = crypto.createHash('md5')
+	host.update(msgobj.nick + '!' + msgobj.user + '@' + msgobj.host)
+	db.run('INSERT INTO log VALUES (null, ?, ?, ?, ?, ?)', [nick, origin, host.digest('hex'), new Date().getTime(), text])
 })
 
 /**
