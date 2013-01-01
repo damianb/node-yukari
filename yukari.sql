@@ -1,5 +1,3 @@
-drop table log;
-
 create table if not exists log (
 	id integer primary key autoincrement,
 	username not null,
