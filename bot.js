@@ -227,7 +227,7 @@ client.alias = function(alias, listener) {
 	return this
 }
 client.addListener('yukari.null-command', function(callback, origin, victim, command) {
-	console.log('unknown command "%s"', command)
+	console.log('possible unknown command "%s"', command)
 })
 
 /**
@@ -400,6 +400,9 @@ client.addListener('yukari.null-command', function(callback, origin, victim, use
 	if(extra !== 'quotes' && arguments.length < 5) return
 
 	db.get('SELECT * FROM quotes WHERE username = ? ORDER BY RANDOM() LIMIT 1', [user], function(err, row) {
+		if(err) throw new Error(err)
+		if(!row) callback(origin, victim + ': no quotes for that user :\\')
+
 		if(row.message.substr(0,4) === '*** ') {
 			callback(origin, util.format('*** %s %s', row.username, row.message.substr(4)))
 		} else {
