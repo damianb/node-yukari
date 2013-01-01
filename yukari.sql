@@ -1,6 +1,9 @@
+drop table log;
+
 create table if not exists log (
 	id integer primary key autoincrement,
 	username not null,
+	channel not null,
 	hostmask not null,
 	time integer not null,
 	message not null
