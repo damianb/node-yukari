@@ -245,7 +245,7 @@ client.addListener('message#', function(nick, origin, text, msgobj) {
 	if(nick === undefined) return
 
 	var host = crypto.createHash('md5')
-	host.update(msgobj.nick + '!' + msgobj.user + '@' + msgobj.host)
+	host.update(msgobj.user + '@' + msgobj.host)
 	db.run('INSERT INTO log VALUES (null, ?, ?, ?, ?, ?)', [nick, origin, host.digest('hex'), new Date().getTime(), text])
 })
 
@@ -344,9 +344,11 @@ client
 			if(mode == 'live') {
 				yukari.c.rr.rounds = 'live'
 				callback(origin, victim + ': live rounds loaded')
-			} else {
+			} else if (mode == 'dummy') {
 				yukari.c.rr.rounds = 'dummy'
 				callback(origin, victim + ': dummy rounds loaded')
+			} else {
+				callback(origin, victim + ': unknown mode ' + mode)
 			}
 		} else {
 			var shot = false
@@ -364,6 +366,20 @@ client
 				callback(origin, victim + ': *click*')
 			}
 		}
+	})
+	.alias('remember', function(callback, origin, victim, targetUser) {
+		console.dir(arguments)
+		console.dir(arguments.length)
+		db.all('SELECT * from log WHERE (username = ? AND message LIKE ? AND time > ?)', [targetUser, '%' + 'word' + '%', new Date().getTime() - (30 * 60 * 1000)], function(err, rows) {
+			if(rows.length > 1) {
+				// welp. no can do...nothing I can find unique...
+			} else if (rows.length == 0) {
+				// no data...erm
+			} else {
+				// HAY WE GOTS DATUR
+				// should transfer quotes from "log" to "quotes" table...
+			}
+		})
 	})
 
 /**
