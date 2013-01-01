@@ -419,7 +419,7 @@ client
 		})
 	})
 client.addListener('yukari.null-command', function(callback, origin, victim, user, extra){
-	if(extra !== 'quotes' && arguments.length < 5) return
+	if(extra !== 'quotes' || arguments.length !== 5) return
 
 	db.get('SELECT * FROM quotes WHERE username = ? ORDER BY RANDOM() LIMIT 1', [user], function(err, row) {
 		if(err) throw new Error(err)
