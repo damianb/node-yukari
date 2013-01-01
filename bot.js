@@ -19,6 +19,7 @@ var http = require('http'),
 	cheerio = require('cheerio'),
 	sqlite = require('sqlite3'),
 	async = require('async'),
+	validator = require('validator')
 	db = new sqlite.Database('yukari.db', function(err) {
 		if(err) throw new Error(err)
 	})
@@ -366,6 +367,27 @@ client
 				callback(origin, victim + ': *click*')
 			}
 		}
+	})
+	.alias(['cg', 'catgirl'], function(callback, origin, victim, entry) {
+		if(entry === undefined) {
+			db.get('SELECT * FROM catgirls ORDER BY RANDOM() LIMIT 1', function(err, row) {
+				if(err) throw new Error(err)
+				if(!row) {
+					callback(origin, victim + ': no catgirls found... :\\')
+				}
+				callback(origin, victim + util.format(': [%s] %s', row.id, row.url))
+			})
+		} else {
+			if(!validator.check(entry).isUrl()) {
+				callback(origin, victim + ': That doesn\'t look like a URL to me...')
+			} else {
+				var host = crypto.createHash('md5')
+				host.update('unavailable')
+				db.run('INSERT INTO catgirls VALUES (null, ?, ?, ?, ?, ?)', [victim, origin, host.digest('hex'), new Date().getTime(), entry])
+				callback(origin, victim + ': added image!')
+			}
+		}
+
 	})
 	.alias('remember', function(callback, origin, victim, targetUser) {
 		if(arguments.length <= 4) {
