@@ -1,7 +1,3 @@
-drop table log;
-drop table users;
-drop table quotes;
-
 create table if not exists log (
 	id integer primary key autoincrement,
 	username not null collate nocase,
