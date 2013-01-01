@@ -486,6 +486,11 @@ client.addListener('yukari.sniff', function(callback, origin, victim, text) {
 		})
 	})
 })
+client.addListener('yukari.sniff', function(callback, origin, victim, text) {
+	if(text.match(/i need an? adult/ig)) {
+		callback(origin, victim + ': owo')
+	}
+})
 
 
 /**
