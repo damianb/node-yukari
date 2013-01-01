@@ -19,7 +19,20 @@ var http = require('http'),
 EventEmitter = require('events').EventEmitter
 
 var yukari = {
-	c: {},
+	c: {
+		rr:{
+			chamber: Math.floor(Math.random()*7),
+			loaded:{
+				1:true,
+				2:true,
+				3:true,
+				4:true,
+				5:true,
+				6:true,
+			},
+			rounds: 'dummy',
+		}
+	},
 	version: '0.3.1',
 	talk: true,
 	start: new Date(),
@@ -290,6 +303,38 @@ client
 				response += 'please insert $0.50 to continue'
 		}
 		callback(origin, response)
+	})
+	.alias('rr', function(callback, origin, victim, mode) {
+		if(mode !== undefined) {
+			if(mode == 'live') {
+				yukari.c.rr.rounds = 'live'
+				callback(origin, victim + ': live rounds loaded')
+			} else {
+				yukari.c.rr.rounds = 'dummy'
+				callback(origin, victim + ': dummy rounds loaded')
+			}
+		} else {
+			var shot = false
+			do {
+				var round = Math.floor(Math.random()*7)
+				if(yukari.c.rr.loaded[round]) shot = true
+			}
+			while(shot === false)
+			if(round === yukari.c.rr.chamber) {
+				// ded.
+				if(true) {
+					client.send('KICK', origin, victim, 'BANG')
+				} else {
+					callback(origin, victim + ': *BANG!*')
+				}
+				for(var i=1;i<=6;i++) yukari.c.rr.loaded[i] = true
+				yukari.c.rr.chamber = Math.floor(Math.random()*7)
+				callback(origin, '*reloads and spins the barrel*')
+			} else {
+				yukari.c.rr.loaded[round] = false
+				callback(origin, victim + ': *click*')
+			}
+		}
 	})
 
 /**
