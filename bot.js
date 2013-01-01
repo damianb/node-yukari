@@ -162,7 +162,7 @@ client.addListener('motd', function (motd) {
  * handle ctcp responses
  */
 client.addListener('ctcp', function (from, to, type, text) {
-	console.log('CTCP ' + type + ': ' + from + '=>' + to + ' (' + type + ')')
+	//console.log('CTCP ' + type + ': ' + from + '=>' + to + ' (' + type + ')')
 
 	ctcp = type.toLowerCase()
 	var cb = function(reply){
@@ -231,10 +231,15 @@ client.addListener('yukari.null-command', function(callback, origin, victim, com
 })
 
 /**
- * message logging
+ * message logging - CTCP action and plain old messages.
+ * should this log joins/parts/kicks and the like? dunno.
  */
 client.addListener('action', function(nick, origin, text, msgobj) {
-	console.dir(arguments)
+	if(nick === undefined) return
+
+	var host = crypto.createHash('md5')
+	host.update('unavailable') // sigh: https://github.com/martynsmith/node-irc/issues/126
+	db.run('INSERT INTO log VALUES (null, ?, ?, ?, ?, ?)', [nick, origin, host.digest('hex'), new Date().getTime(), '*** ' + text])
 })
 client.addListener('message#', function(nick, origin, text, msgobj) {
 	if(nick === undefined) return
@@ -274,10 +279,8 @@ client
 			return
 
 		args = Array.prototype.slice.call(arguments, 3)
-		console.dir(args)
 		target = arguments[3]
 		command = arguments[4]
-		console.log(target)
 		if(client.listeners('yukari.command.' + command).length == 0) {
 			callback(origin, victim + ': invalid command "' + command + '"')
 			return
