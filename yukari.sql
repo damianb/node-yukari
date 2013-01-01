@@ -1,3 +1,5 @@
+drop table quotes;
+
 create table if not exists log (
 	id integer primary key autoincrement,
 	username not null,
@@ -10,6 +12,8 @@ create table if not exists log (
 create table if not exists quotes (
 	id integer primary key autoincrement,
 	username not null,
+	channel not null,
+	hostmask not null,
 	time integer not null,
 	message not null
 );
