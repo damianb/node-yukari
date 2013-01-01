@@ -355,7 +355,6 @@ client
 			}
 		})
 	})
-/*
 client.addListener('yukari.sniff', function(callback, origin, victim, text) {
 	process.nextTick(function() {
 		youtube = text.match(/http:\/\/(?:(?:www\.)?youtube\.com|youtu\.be)(?:\/watch\?v=|\/)([\w\-\_]+)/ig)
@@ -376,7 +375,6 @@ client.addListener('yukari.sniff', function(callback, origin, victim, text) {
 		})
 	})
 })
-*/
 
 
 
