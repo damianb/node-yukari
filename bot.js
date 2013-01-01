@@ -378,14 +378,16 @@ client
 				callback(origin, victim + util.format(': [%s] %s', row.id, row.url))
 			})
 		} else {
-			if(!validator.check(entry).isUrl()) {
+			try {
+				validator.check(entry).isUrl()
+			} catch(e) {
 				callback(origin, victim + ': That doesn\'t look like a URL to me...')
-			} else {
-				var host = crypto.createHash('md5')
-				host.update('unavailable')
-				db.run('INSERT INTO catgirls VALUES (null, ?, ?, ?, ?, ?)', [victim, origin, host.digest('hex'), new Date().getTime(), entry])
-				callback(origin, victim + ': added image!')
+				return
 			}
+			var host = crypto.createHash('md5')
+			host.update('unavailable')
+			db.run('INSERT INTO catgirls VALUES (null, ?, ?, ?, ?, ?)', [victim, origin, host.digest('hex'), new Date().getTime(), entry])
+			callback(origin, victim + ': added image!')
 		}
 
 	})
