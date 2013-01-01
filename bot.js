@@ -68,13 +68,9 @@ nconf.defaults({
 console.log('-!- preparing database')
 fs.readFileSync('./yukari.sql')
 db.serialize(function() {
-	var dbOut = function(line) {
-		db.exec(line, function(err) { if(err) { console.log('ee: ' + err) } /*console.log('  : ' + line)*/ })
-	}
+	var dbOut = function(line) { db.exec(line, function(err) { if(err) console.log('ee: ' + err) }) }
 	fs.readFileSync('./yukari.sql').toString().split(';\n').forEach(function(line){
-		if(!line.match(/^\s*$/)) {
-			dbOut(line)
-		}
+		if(!line.match(/^\s*$/)) dbOut(line)
 	})
 })
 
@@ -389,7 +385,9 @@ client
 			db.run('INSERT INTO catgirls VALUES (null, ?, ?, ?, ?, ?)', [victim, origin, host.digest('hex'), new Date().getTime(), entry])
 			callback(origin, victim + ': added image!')
 		}
-
+	})
+	.alias('valve', function(callback, origin, victim) {
+		callback(origin, victim + ': http://i.imgur.com/QE3Ze.png')
 	})
 	.alias('remember', function(callback, origin, victim, targetUser) {
 		if(arguments.length <= 4) {
@@ -513,6 +511,11 @@ client.addListener('yukari.sniff', function(callback, origin, victim, text) {
 client.addListener('yukari.sniff', function(callback, origin, victim, text) {
 	if(text.match(/i need an? adult/ig)) {
 		callback(origin, victim + ': owo')
+	}
+})
+client.addListener('yukari.sniff', function(callback, origin, victim, text) {
+	if(text.match(/pervert/ig)) {
+		callback(origin, 'http://i.imgur.com/Rxoix.png')
 	}
 })
 
