@@ -9,7 +9,9 @@
 		"url": "0.4.x",
 		"nconf": "0.6.x",
 		"cheerio": "0.9.x",
-		"strftime":"0.4.x"
+		"strftime":"0.4.x",
+		"async":"0.1.x",
+		"sqlite3":"2.1.x"
 	},
 	"devDependencies": {},
 	"engine": "node >= 0.8.x"
