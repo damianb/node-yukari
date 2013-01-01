@@ -233,6 +233,9 @@ client.addListener('yukari.null-command', function(callback, origin, victim, com
 /**
  * message logging
  */
+client.addListener('action', function(nick, origin, text, msgobj) {
+	console.dir(arguments)
+})
 client.addListener('message#', function(nick, origin, text, msgobj) {
 	if(nick === undefined) return
 
