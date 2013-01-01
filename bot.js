@@ -306,12 +306,14 @@ grabYoutube = function(videoid, callback) {
 				res
 					.on('data', function(chunk) { api_body += chunk })
 					.on('end', function() {
-						var data = JSON.parse(api_body)
-						callback(util.format('[YouTube] <http://youtu.be/%s> "%s" [%d:%d] - %d views',
+						var data = JSON.parse(api_body),
+							time = Math.floor(data['entry']['media$group']['yt$duration']['seconds'] / 60) + ':',
+							seconds = data['entry']['media$group']['yt$duration']['seconds'] % 60
+						time += ((seconds <= 9) ? '0' + seconds.toString() : seconds)
+						callback(util.format('[YouTube] <http://youtu.be/%s> "%s" [%s] - %d views',
 							data['entry']['media$group']['yt$videoid']['$t'],
 							data['entry']['title']['$t'],
-							Math.round(data['entry']['media$group']['yt$duration']['seconds'] / 60),
-							data['entry']['media$group']['yt$duration']['seconds'] % 60,
+							time,
 							Number(data['entry']['yt$statistics']['viewCount'])
 						))
 					})
