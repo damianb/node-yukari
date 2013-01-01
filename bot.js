@@ -401,7 +401,10 @@ client.addListener('yukari.null-command', function(callback, origin, victim, use
 
 	db.get('SELECT * FROM quotes WHERE username = ? ORDER BY RANDOM() LIMIT 1', [user], function(err, row) {
 		if(err) throw new Error(err)
-		if(!row) callback(origin, victim + ': no quotes for that user :\\')
+		if(!row) {
+			callback(origin, victim + ': no quotes for that user :\\')
+			return
+		}
 
 		if(row.message.substr(0,4) === '*** ') {
 			callback(origin, util.format('*** %s %s', row.username, row.message.substr(4)))
