@@ -16,7 +16,7 @@ create table if not exists quotes (
 create table if not exists users (
 	id integer primary key autoincrement,
 	type integer not null,
-	username not null
+	username not null,
 	time integer not null
 );
 

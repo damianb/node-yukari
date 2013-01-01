@@ -200,7 +200,7 @@ client.addListener('message#', function (nick, origin, text) {
 				split = addr.slice(1).shift().split(' ')
 				command = split.shift()
 				// @todo special emit perhaps, because this was addressed?
-				if(client.listeners('yukari.' + command).length == 0) {
+				if(client.listeners('yukari.command.' + command).length == 0) {
 					// invalid command!
 					client.emit.apply(client, ['yukari.null-command', sayResponse, origin, nick, command].concat(split))
 				} else {
