@@ -368,16 +368,25 @@ client
 		}
 	})
 	.alias('remember', function(callback, origin, victim, targetUser) {
-		console.dir(arguments)
-		console.dir(arguments.length)
-		db.all('SELECT * from log WHERE (username = ? AND message LIKE ? AND time > ?)', [targetUser, '%' + 'word' + '%', new Date().getTime() - (30 * 60 * 1000)], function(err, rows) {
+		if(arguments.length <= 4) {
+			// no can do...
+			callback(origin, victim + ': not enough arguments')
+			return
+		}
+
+		var phrase = ''
+		for(var i = 5; i <= arguments.length; i++) phrase += arguments[i]
+		db.all('SELECT * from log WHERE (username = ? AND message LIKE ? AND time > ?)', [targetUser, '%' + phrase.replace('%', '') + '%', new Date().getTime() - (30 * 60 * 1000)], function(err, rows) {
 			if(rows.length > 1) {
+				callback(origin, victim + ': ' + rows.length + ' results returned, try something more specific')
 				// welp. no can do...nothing I can find unique...
 			} else if (rows.length == 0) {
-				// no data...erm
+				callback(origin, victim + ': no results returned for quotes within the last half hour.. :\\')
 			} else {
+				var text = '<' + rows[0].username + '> ' + rows[0].text
+				callback(origin, victim + ': remembering ' + text)
 				// HAY WE GOTS DATUR
-				// should transfer quotes from "log" to "quotes" table...
+				// should transfer quotes from "log" to "quotes" table here
 			}
 		})
 	})
