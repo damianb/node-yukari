@@ -234,7 +234,7 @@ client.addListener('yukari.null-command', function(callback, origin, victim, com
  */
 client.addListener('message#', function(nick, origin, text, msgobj) {
 	var host = msgobj.nick + '!' + msgobj.user + '@' + msgobj.host
-	db.run('INSERT INTO log VALUES (null, ?, ?, ?, ?)', [nick, origin, host, new Date().getTime(), text])
+	db.run('INSERT INTO log VALUES (null, ?, ?, ?, ?, ?)', [nick, origin, host, new Date().getTime(), text])
 })
 
 /**
