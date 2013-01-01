@@ -385,10 +385,13 @@ client
 			} else if (rows.length == 0) {
 				callback(origin, victim + ': no results returned for quotes within the last half hour.. :\\')
 			} else {
-				var text = '<' + rows[0].username + '> ' + rows[0].text
-				callback(origin, victim + ': remembering ' + text)
-				// HAY WE GOTS DATUR
-				// should transfer quotes from "log" to "quotes" table here
+				if(rows[0].message.substr(0, 4) === '*** ') {
+					// action, handle accordingly...maybe...ehhhhhhhhhhfuckit. do it later.
+				} else {
+					var text = '<' + rows[0].username + '> ' + rows[0].message, row = rows[0]
+					callback(origin, victim + ': remembering ' + text)
+					db.run('INSERT INTO quotes VALUES (null, ?, ?, ?, ?, ?)', [row.username, row.channel, row.hostmask, row.time, row.message])
+				}
 			}
 		})
 	})
