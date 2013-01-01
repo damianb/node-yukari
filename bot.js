@@ -375,8 +375,10 @@ client
 		}
 
 		var phrase = ''
-		for(var i = 5; i <= arguments.length; i++) phrase += arguments[i]
-		db.all('SELECT * from log WHERE (username = ? AND message LIKE ? AND time > ?)', [targetUser, '%' + phrase.replace('%', '') + '%', new Date().getTime() - (30 * 60 * 1000)], function(err, rows) {
+		for(var i = 5; i <= arguments.length; i++) phrase += arguments[i - 1]
+		phrase = phrase.replace(/%/g, '')
+		db.all('SELECT * from log WHERE (username = ? AND message LIKE ? AND time >= ?)', [targetUser, '%' + phrase + '%', new Date().getTime() - (30 * 60 * 1000)], function(err, rows) {
+			console.dir([targetUser, '%' + phrase.replace('%', '') + '%', new Date().getTime() - (30 * 60 * 1000)])
 			if(rows.length > 1) {
 				callback(origin, victim + ': ' + rows.length + ' results returned, try something more specific')
 				// welp. no can do...nothing I can find unique...
