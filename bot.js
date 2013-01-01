@@ -33,7 +33,7 @@ var yukari = {
 			rounds: 'dummy',
 		}
 	},
-	version: '0.3.2',
+	version: '0.4.0',
 	talk: true,
 	start: new Date(),
 }
@@ -385,16 +385,28 @@ client
 			} else if (rows.length == 0) {
 				callback(origin, victim + ': no results returned for quotes within the last half hour.. :\\')
 			} else {
-				if(rows[0].message.substr(0, 4) === '*** ') {
-					// action, handle accordingly...maybe...ehhhhhhhhhhfuckit. do it later.
+				var text = '', row = rows[0]
+				if(row.message.substr(0, 4) === '*** ') {
+					text = util.format('*** %s %s', row.username, row.message.substr(4))
 				} else {
-					var text = '<' + rows[0].username + '> ' + rows[0].message, row = rows[0]
-					callback(origin, victim + ': remembering ' + text)
-					db.run('INSERT INTO quotes VALUES (null, ?, ?, ?, ?, ?)', [row.username, row.channel, row.hostmask, row.time, row.message])
+					text = util.format('<%s> %s', row.username, row.message)
 				}
+				callback(origin, victim + ': remembering ' + text)
+				db.run('INSERT INTO quotes VALUES (null, ?, ?, ?, ?, ?)', [row.username, row.channel, row.hostmask, row.time, row.message])
 			}
 		})
 	})
+client.addListener('yukari.null-command', function(callback, origin, victim, user, extra){
+	if(extra !== 'quotes' && arguments.length < 5) return
+
+	db.get('SELECT * FROM quotes WHERE username = ? ORDER BY RANDOM() LIMIT 1', [user], function(err, row) {
+		if(row.message.substr(0,4) === '*** ') {
+			callback(origin, util.format('*** %s %s', row.username, row.message.substr(4)))
+		} else {
+			callback(origin, util.format('<%s> %s', row.username, row.message))
+		}
+	})
+})
 
 /**
  * Youtube!
