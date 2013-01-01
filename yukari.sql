@@ -1,25 +1,29 @@
+drop table log;
+drop table users;
+drop table quotes;
+
 create table if not exists log (
 	id integer primary key autoincrement,
-	username not null,
-	channel not null,
+	username not null collate nocase,
+	channel not null collate nocase,
 	hostmask not null,
 	time integer not null,
-	message not null
+	message not null collate nocase
 );
 
 create table if not exists quotes (
 	id integer primary key autoincrement,
-	username not null,
+	username not null collate nocase,
 	channel not null,
 	hostmask not null,
 	time integer not null,
-	message not null
+	message not null collate nocase
 );
 
 create table if not exists users (
 	id integer primary key autoincrement,
 	type integer not null,
-	username not null,
+	username not null collate nocase,
 	time integer not null
 );
 
