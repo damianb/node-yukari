@@ -32,9 +32,14 @@ var yukari = {
 		rr:{
 			chamber: Math.floor(Math.random()*7),
 			rounds: 'dummy',
+		},
+		to:{
+			blacklist:[
+				'dai'
+			]
 		}
 	},
-	version: '0.5.0',
+	version: '0.6.0',
 	talk: true,
 	start: new Date(),
 }
@@ -62,6 +67,13 @@ nconf.defaults({
 		'port'			:6667,
 		'password'		:null,
 		'secure'		:false
+	},
+	'twitter':{
+		'enable'		:false,
+		'consumer_key'	:'',
+		'consumer_secret':'',
+		'access_token'	:'',
+		'access_token_secret':'',
 	}
 })
 
@@ -88,6 +100,10 @@ var client = new irc.Client(nconf.get('irc:address'), nconf.get('bot:nick'), {
 	autoConnect: false,
 	stripColors: true
 })
+
+if(nconf.get('twitter:enable')) {
+	// asdf
+}
 
 var nickcheck = new RegExp('^' + nconf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + '\\W+\\s*(.*)', 'i'),
 	sayResponse = function(origin, response) {
@@ -122,6 +138,13 @@ var nickcheck = new RegExp('^' + nconf.get('bot:nick').replace(/[\-\[\]\/\{\}\(\
 			s = "0" + dtm.getSeconds(),
 			cs = "0" + Math.round(dtm.getMilliseconds() / 10)
 		return h.substr(h.length-4) + ":" + m.substr(m.length-2) + ":" + s.substr(s.length-2) + "." + cs.substr(cs.length-2)
+	},
+	genAuthCode = function() {
+		yukari.authcode = crypto.createHash('md5').update(Math.floor(Date.now() / 1).toString()).digest('hex')
+		console.log('new authcode generated: ' + yukari.authcode)
+	},
+	genAuthHash = function(host) {
+		crypto.createHash('sha256')
 	}
 
 
@@ -168,16 +191,14 @@ client.addListener('ctcp', function (from, to, type, text) {
 		split = text.split(' ')
 
 	if(ctcp == 'privmsg' && split.shift() == 'action') {
-		//console.log('CTCP ' + type + ': ' + from + '=>' + to + ' (' + type + ')')
 		client.emit('yukari.action', sayResponse, to, from, split)
 	} else {
-		//console.log('CTCP ' + type + ': ' + from + '=>' + to + ' (' + type + ')')
 		client.emit('yukari.ctcp.' + ctcp, cb, from, to, ctcp, text)
 	}
 })
 
 /**
- * handle commands in our primary channel
+ * handle commands
  */
 client.addListener('message#', function (nick, origin, text) {
 	var addr, split, command
@@ -204,6 +225,8 @@ client.addListener('message#', function (nick, origin, text) {
 				} else {
 					client.emit.apply(client, ['yukari.command.' + command, sayResponse, origin, nick].concat(split))
 				}
+				split.unshift(command)
+				client.emit.apply(client, ['yukari.direct', sayResponse, origin, nick, split.join(' ')])
 			} else {
 				client.emit('yukari.sniff', sayResponse, origin, nick, text)
 			}
@@ -235,7 +258,12 @@ client.addListener('action', function(nick, origin, text, msgobj) {
 	if(nick === undefined) return
 
 	var host = crypto.createHash('md5')
-	host.update('unavailable') // sigh: https://github.com/martynsmith/node-irc/issues/126
+	// sigh: https://github.com/martynsmith/node-irc/issues/126
+	if(msgobj !== undefined) {
+		host.update(msgobj.user + '@' + msgobj.host)
+	} else {
+		host.update('unavailable')
+	}
 	db.run('INSERT INTO log VALUES (null, ?, ?, ?, ?, ?)', [nick, origin, host.digest('hex'), new Date().getTime(), '*** ' + text])
 })
 client.addListener('message#', function(nick, origin, text, msgobj) {
@@ -254,9 +282,14 @@ client
 		// @todo authorization check
 
 		callback(origin, 'Bai!')
+		client.send('KICK', origin, victim, 'BANG')
+
+		/*
+		callback(origin, 'Bai!')
 		console.log('-!- TERMINATING')
 		client.disconnect('Yukari.js IRC bot - version ' + yukari.version)
 		process.exit(0)
+		*/
 	})
 	.alias('source', function(callback, origin, victim) {
 		callback(origin, victim + ': My source is available at <https://github.com/damianb/node-yukari>')
@@ -278,11 +311,15 @@ client
 		args = Array.prototype.slice.call(arguments, 3)
 		target = arguments[3]
 		command = arguments[4]
+		if(yukari.c.to.blacklist.indexOf(command) !== -1) {
+			callback(origin, victim + ': command "' + command + '" has been blacklisted')
+			return
+		}
 		if(client.listeners('yukari.command.' + command).length == 0) {
 			callback(origin, victim + ': invalid command "' + command + '"')
 			return
 		}
-
+		console.dir(args)
 		client.emit.apply(client, ['yukari.command.' + command, callback, origin].concat(args))
 	})
 	.alias('pi', function(callback, origin, victim) {
@@ -418,8 +455,18 @@ client
 			}
 		})
 	})
-client.addListener('yukari.null-command', function(callback, origin, victim, user, extra){
-	if(extra !== 'quotes' || arguments.length !== 5) return
+	.alias('auth', function(callback, origin, victim, authCode) {
+		// asdf
+		if(authCode !== yukari.authcode) {
+			// BZZZT
+		} else {
+			// winnar...new entry.
+		}
+	})
+client.addListener('yukari.direct', function(callback, origin, victim, text){
+	var res = text.match(/^([a-z_\-\[\]\\^{}|`][a-z0-9_\-\[\]\\^{}|`]*) quotes$/i), user = ''
+	if(res === null) return
+	user = res[1]
 
 	db.get('SELECT * FROM quotes WHERE username = ? ORDER BY RANDOM() LIMIT 1', [user], function(err, row) {
 		if(err) throw new Error(err)
@@ -509,14 +556,19 @@ client.addListener('yukari.sniff', function(callback, origin, victim, text) {
 	})
 })
 client.addListener('yukari.sniff', function(callback, origin, victim, text) {
-	if(text.match(/i need an? adult/ig)) {
+	var rn = new Date().getTime().toString().substr(-1)
+	if(rn >= 7 && text.match(/i need an? adult/ig)) {
 		callback(origin, victim + ': owo')
 	}
 })
 client.addListener('yukari.sniff', function(callback, origin, victim, text) {
-	if(text.match(/pervert/ig)) {
+	var rn = new Date().getTime().toString().substr(-1)
+	if( rn >= 3 && text.match(/pervert/ig)) {
 		callback(origin, 'http://i.imgur.com/Rxoix.png')
 	}
+})
+client.addListener('error', function(message) {
+	console.log('error: ', message)
 })
 
 
@@ -525,3 +577,4 @@ client.addListener('yukari.sniff', function(callback, origin, victim, text) {
  */
 client.connect()
 console.log('-!- Starting up Yukari...')
+genAuthCode()
