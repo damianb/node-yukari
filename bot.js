@@ -415,7 +415,7 @@ client
 				}
 				callback(origin, victim + util.format(': [%s] %s', row.id, row.url))
 			})
-		} else if(parseInt(entry) !== NaN) {
+		} else if(!isNaN(entry)) {
 			db.get('SELECT * FROM catgirls WHERE id = ?', parseInt(entry), function(err, row) {
 				if(err) throw new Error(err)
 				if(!row) {
