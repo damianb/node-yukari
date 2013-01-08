@@ -37,7 +37,8 @@ var yukari = {
 			blacklist:[
 				'dai',
 				'die',
-				'rr'
+				'rr',
+				'to'
 			]
 		}
 	},
