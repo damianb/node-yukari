@@ -319,8 +319,9 @@ client
 			callback(origin, victim + ': invalid command "' + command + '"')
 			return
 		}
+		args.shift(); args.shift()
 		console.dir(args)
-		client.emit.apply(client, ['yukari.command.' + command, callback, origin].concat(args))
+		client.emit.apply(client, ['yukari.command.' + command, callback, origin, target].concat(args))
 	})
 	.alias('pi', function(callback, origin, victim) {
 		// need to throttle
