@@ -496,6 +496,13 @@ client.addListener('yukari.direct', function(callback, origin, victim, text){
 		}
 	})
 })
+client.addListener('yukari.direct', function(callback, origin, victim, text) {
+	var res = text.match(/^[\w\s]+(?: or [\w\s]+)+\??$/i), choices = []
+	if(res === null) return
+	res = res.substr(res.length - 1)
+	choices = res.split(/ or /ig)
+	callback(origin, victim + ': ' + choices[Math.floor(Math.random() * choices.length)])
+})
 
 /**
  * Youtube!
