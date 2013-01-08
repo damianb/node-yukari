@@ -42,7 +42,7 @@ var yukari = {
 			]
 		}
 	},
-	version: '0.6.0',
+	version: '0.6.1',
 	talk: true,
 	start: new Date(),
 }
@@ -499,8 +499,8 @@ client.addListener('yukari.direct', function(callback, origin, victim, text){
 client.addListener('yukari.direct', function(callback, origin, victim, text) {
 	var res = text.match(/^[\w\s]+(?: or [\w\s]+)+\??$/i), choices = []
 	if(res === null) return
-	res = res.substr(res.length - 1)
-	choices = res.split(/ or /ig)
+	res = text.substr(text.length - 1)
+	choices = text.split(/ or /ig)
 	callback(origin, victim + ': ' + choices[Math.floor(Math.random() * choices.length)])
 })
 
