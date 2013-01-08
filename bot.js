@@ -413,8 +413,15 @@ client
 				}
 				callback(origin, victim + util.format(': [%s] %s', row.id, row.url))
 			})
+		} else if(parseInt(entry) !== NaN) {
+			db.get('SELECT * FROM catgirls WHERE id = ?', parseInt(entry), function(err, row) {
+				if(err) throw new Error(err)
+				if(!row) {
+					callback(origin, victim + ': no catgirl image with that id found... :\\')
+				}
+				callback(origin, victim + util.format(': [%s] %s', row.id, row.url))
+			})
 		} else {
-			//if(entry)
 			try {
 				validator.check(entry).isUrl()
 			} catch(e) {
