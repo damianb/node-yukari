@@ -35,7 +35,9 @@ var yukari = {
 		},
 		to:{
 			blacklist:[
-				'dai'
+				'dai',
+				'die',
+				'rr'
 			]
 		}
 	},
@@ -412,6 +414,7 @@ client
 				callback(origin, victim + util.format(': [%s] %s', row.id, row.url))
 			})
 		} else {
+			//if(entry)
 			try {
 				validator.check(entry).isUrl()
 			} catch(e) {
