@@ -411,6 +411,7 @@ client
 				if(err) throw new Error(err)
 				if(!row) {
 					callback(origin, victim + ': no catgirls found... :\\')
+					return
 				}
 				callback(origin, victim + util.format(': [%s] %s', row.id, row.url))
 			})
@@ -419,6 +420,7 @@ client
 				if(err) throw new Error(err)
 				if(!row) {
 					callback(origin, victim + ': no catgirl image with that id found... :\\')
+					return
 				}
 				callback(origin, victim + util.format(': [%s] %s', row.id, row.url))
 			})
